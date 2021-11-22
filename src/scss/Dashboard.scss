@@ -1,0 +1,291 @@
+@import "./default";
+
+.bw-DashboardContent {
+  margin-top: 25px;
+
+  .sectionTitle {
+    font-size: 16px;
+    color: $bwt_cardTextColor;
+    margin-top: 24px;
+  }
+
+  .sectionTitleContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+
+    .sectionTitle {
+      margin-top: 0;
+    }
+
+    button.buttonUrlSubmissionsDownload {
+      margin-right: 24px;
+    }
+  }
+
+  .bw-CardRow {
+    margin: 8px 0;
+    font-size: 16px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+
+    .bw-CardColumn-1 {
+      width: 100%;
+      min-width: 320px;
+    }
+
+    .bw-CardColumn-2 {
+      width: calc((100% - 8px) / 2);
+      min-width: 320px;
+    }
+
+    .bw-CardColumn {
+      background-color: $bwt_white;
+      position: relative;
+      box-shadow: 0px 0.6px 2px #0000001c;
+      border-radius: 2px;
+      display: flex;
+
+      .bw-PopOverMenu {
+        width: 10%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+        }
+
+        .moreIcon {
+          margin-top: 18px;
+        }
+
+        .popOverContainer {
+          position: relative;
+
+          .popOverPanel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 8px 10px;
+            z-index: 100;
+            box-shadow: 0px 1px 4px #0000001c;
+            background-color: $bwt_white;
+            border: 1px solid #eeeeee;
+            border-radius: 2px;
+            white-space: nowrap;
+            display: none;
+          }
+
+          .openPopOverMenu {
+            display: block;
+          }
+        }
+      }
+
+      .bw-Card-WithPopOver {
+        width: 90%;
+      }
+
+      .bw-Disabled {
+        filter: opacity(0.4);
+        &:hover {
+          background-color: inherit;
+          cursor: inherit;
+        }
+      }
+
+      .bw-Card {
+        padding: 18px 24px;
+        width: 100%;
+
+        .cardTitle {
+          font-size: 16px;
+          color: $bwt_cardTextColor;
+
+          .bw-CardTitleIcon {
+            margin-right: 4px;
+          }
+
+          span {
+            margin: 0 8px;
+          }
+
+          i.info {
+            color: $bwt_optionalTextColor;
+            cursor: pointer;
+            vertical-align: middle;
+          }
+        }
+
+        .cardDescription {
+          font-size: 12px;
+          color: $bwt_standardTextColor;
+          margin-left: 25px;
+          margin-top: 10px;
+        }
+      }
+    }
+
+    .bw-OverviewSection {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      .infoCards {
+        background-color: $bwt_white;
+        width: calc((100% - 16px) / 3);
+        padding: 24px;
+        box-shadow: 0px 0.6px 2px #0000001c;
+        border-radius: 2px;
+
+        h4 {
+          font-size: 14px;
+        }
+        h2 {
+          font-size: 24px;
+        }
+        p {
+          font-size: 11px;
+          color: $bwt_optionalTextColor;
+        }
+      }
+    }
+
+    .bw-ApiKeyCard {
+      .cardDescription {
+        color: $bwt_cardTextColor;
+      }
+    }
+
+    .bw-ManualURLSubmissionCard {
+      .bw-Card {
+        .cardContent {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+    }
+
+    .bw-UrlSubmissions {
+      padding: 0;
+
+      > * {
+        width: 100%;
+      }
+
+      .ms-DetailsHeader {
+        padding-top: 0;
+      }
+
+      .ms-DetailsRow-cell {
+        color: $bwt_cardTextColor;
+      }
+
+      i.retryIcon {
+        cursor: pointer;
+
+        &:hover {
+          color: $bwt_primaryTealColor;
+          font-weight: bolder;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .footnotes {
+    font-size: 12px;
+    color: $bwt_secondaryTextColor;
+  }
+}
+
+.bw-Modal {
+  display: none;
+  position: fixed;
+  width: 40%;
+  top: 30%;
+  left: 30%;
+  z-index: 1;
+  box-shadow: -3px 6px 16px #00000029;
+  border-radius: 2px;
+
+  .modalContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: $bwt_white;
+
+    .modalHeader {
+      padding: 24px 32px;
+      color: $bwt_cardTextColor;
+      display: flex;
+      justify-content: space-between;
+
+      p {
+        font-size: 21px;
+      }
+
+      .modalClose {
+        cursor: pointer;
+      }
+    }
+
+    .modalContent {
+      padding: 24px 32px;
+
+      .textField {
+        input {
+          border-radius: 0;
+          border: none;
+        }
+      }
+
+      p {
+        font-size: 12px;
+        color: $bwt_standardTextColor;
+      }
+    }
+
+    .modalFooter {
+      padding: 24px 32px;
+      border-top: solid 1px rgba(0, 0, 0, 0.1);
+
+      button.button {
+        border-radius: 0;
+        margin-right: 16px;
+      }
+
+      button.primaryButton {
+        background-color: $bwt_primaryTealColor;
+        color: $bwt_white;
+      }
+
+      button.secondaryButton {
+        background-color: $bwt_white;
+      }
+    }
+  }
+}
+
+.showModal {
+  display: block;
+  animation: animateIn 0.3s;
+}
+
+@keyframes animateIn {
+  from {
+    top: 100%;
+    opacity: 0;
+  }
+  to {
+    top: 30%;
+    opacity: 1;
+  }
+}
+
+.darken {
+  filter: opacity(0.5);
+}

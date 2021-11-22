@@ -1,0 +1,11 @@
+﻿@mixin box-shadow($boxshadow, $hovershadow) {
+    -webkit-box-shadow: $boxshadow;
+    -moz-box-shadow: $boxshadow;
+    box-shadow: $boxshadow;
+
+    &:hover {
+        -webkit-box-shadow: $hovershadow;
+        -moz-box-shadow: $hovershadow;
+        box-shadow: $hovershadow;
+    }
+}

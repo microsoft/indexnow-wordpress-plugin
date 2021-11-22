@@ -1,0 +1,505 @@
+@import "./default";
+
+.rightHeaderPanel {
+  margin: 24px -16px;
+
+  .panelView {
+    padding: 0 16px;
+  }
+
+  .contentLabel {
+    @include font-type($bwt_scopeFontFamily, $bwt_standardFontSize);
+  }
+  .contentLabelActive {
+    @include font-type($bwt_semiboldFontFamily, $bwt_standardFontSize);
+  }
+  .showContent {
+    height: auto;
+    overflow: hidden;
+  }
+
+  .chevronIcon {
+    cursor: pointer;
+    padding-right: 10px;
+  }
+
+  .contentLabelInfo {
+    @include font-type($bwt_semiboldFontFamily, $bwt_secondaryFontSize);
+    padding-top: 8px;
+  }
+
+  .profileInfo {
+    margin: 24px 16px 0;
+  }
+  .accountUserInfo {
+    width: calc(100% - 72px);
+  }
+  .profileDetails {
+    margin: 24px 0;
+  }
+
+  .accountDeleteButton {
+    @include font-type($bwt_semiboldFontFamily, $bwt_standardFontSize);
+    @include border-radius(2px);
+    background: transparent;
+    border: 1px solid $bwt_errorColor;
+    color: $bwt_errorColor;
+    cursor: pointer;
+    &:hover {
+      color: $bwt_white;
+      background: $bwt_errorHoverBackGroundColor;
+      border: 1px solid $bwt_errorHoverBackGroundColor;
+    }
+  }
+  .contentInfo {
+    padding-top: 16px;
+  }
+  .contentLabelDesc {
+    margin: 12px 0 16px;
+    @include font-type($bwt_scopeFontFamily, $bwt_secondaryFontSize);
+  }
+
+  .contentTextField {
+    margin-top: 16px;
+  }
+  .contentTextFieldPhone {
+    div {
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+    }
+  }
+
+  .countryCode {
+    width: 60px;
+    height: 32px;
+    border: 1px solid rgb(96, 94, 92);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    border-right: none;
+    text-align: center;
+    line-height: 30px;
+  }
+
+  .phoneTextField {
+    width: 248px;
+  }
+  .panelFormButtons {
+    margin-top: 24px;
+  }
+
+  .bwtAccordion {
+    > ul > li {
+      padding: 16px;
+      border-top: $bwt_lightGrayBorder;
+
+      &:last-child {
+        border-bottom: $bwt_lightGrayBorder;
+      }
+
+      &.expandItem {
+        .contentLabel {
+          @include font-type($bwt_semiboldFontFamily, $bwt_standardFontSize);
+        }
+      }
+    }
+
+    .accordionLabel {
+      cursor: pointer;
+    }
+
+    .bwtAccordionContent {
+      transform-origin: top;
+    }
+  }
+
+  .toggleButton {
+    > label {
+      width: calc(100% - 56px);
+      color: $bwt_primaryTextColor;
+    }
+
+    > div {
+      label {
+        width: 0;
+        margin: 0;
+      }
+    }
+  }
+
+  .secondaryText {
+    @include font-type($bwt_scopeFontFamily, $bwt_secondaryFontSize);
+    color: $bwt_standardTextColor;
+    padding-bottom: 12px;
+  }
+
+  .chevronRotate > i {
+    transform: rotate(-180deg);
+  }
+
+  .padding0 {
+    padding: 0;
+  }
+
+  .commentTextFiled {
+    margin-bottom: 20px;
+  }
+
+  .ratingComponent {
+    margin: 12px 0 20px;
+
+    .ratingNumbers {
+      list-style-type: none;
+      display: flex;
+    }
+
+    .feedbackRatingCount {
+      margin: 16px 0 8px;
+    }
+
+    li {
+      @include border-radius(2px);
+      @include font-type($bwt_semiboldFontFamily, $bwt_secondaryFontSize);
+      margin-right: 3px;
+      color: $bwt_primaryTextColor;
+      background: $bwt_lightGray50Color;
+      height: 28px;
+      width: 24px;
+      text-align: center;
+      line-height: 28px;
+      cursor: pointer;
+      flex: 1;
+      &:hover {
+        background: $bwt_lightGray60Color;
+      }
+
+      &.activeClass {
+        background: $bwt_primaryTealColor;
+        color: $bwt_white;
+        &:hover {
+          background: $bwt_headerElementsHoverBackGroundColor;
+        }
+      }
+    }
+  }
+
+  .feedbackComment {
+    margin-top: 12px;
+
+    h3 {
+      @include font-type($bwt_semiboldFontFamily, $bwt_standardFontSize);
+      margin-bottom: 4px;
+    }
+
+    p {
+      @include font-type($bwt_scopeFontFamily, $bwt_secondaryFontSize);
+      padding-bottom: 4px;
+    }
+  }
+
+  .settingsModule {
+    padding: 10px 0 24px;
+    border-bottom: $bwt_lightGrayBorder;
+    position: relative;
+
+    &:last-child {
+      border: 0;
+      padding-bottom: 0;
+    }
+
+    h4 {
+      font-weight: 600;
+      padding-bottom: 8px;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+
+      &::after {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: " ";
+      }
+    }
+  }
+}
+
+.leftHeaderPanel {
+  .headerTitle {
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .bingToolsLinks {
+    margin: 12px 0;
+  }
+}
+
+.leftPanelIcon {
+  line-height: 54px;
+  cursor: pointer;
+}
+
+.noNotification {
+  width: 70%;
+  margin: auto;
+  text-align: center;
+  padding: 50px 0;
+
+  h2 {
+    font-weight: 600;
+  }
+
+  p {
+    padding-top: 20px;
+    color: $bwt_optionalTextColor;
+  }
+}
+.notificationsFilter {
+  top: 0;
+  position: sticky;
+  z-index: 10;
+  background: $bwt_lightGray10Color;
+  padding: 0 16px 12px;
+  margin: -24px -16px 5px;
+  .notificationFilterDropdown {
+    width: 135px;
+    margin-top: 12px;
+    margin-right: 8px;
+    display: inline-block;
+
+    * {
+      border-color: $bwt_filterBorderColor;
+    }
+  }
+  .toggleButton {
+    width: 140px;
+    margin-bottom: 0px;
+    margin-top: 14px;
+  }
+}
+
+.messageCard {
+  @include box-shadow($bwt_messageCardShadow, $bwt_messageCardHoverShadow);
+  @include border-radius(2px);
+  background: $bwt_white;
+  cursor: pointer;
+  min-width: 300px;
+  border-radius: 2px;
+  transition: box-shadow 0.5s ease 0s;
+  position: relative;
+  padding: 16px;
+  margin-bottom: 10px;
+
+  .messageTime {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    @include font-type($bwt_scopeFontFamily, 12px);
+    color: $bwt_darkGray40Color;
+  }
+
+  .messageSiteUrl {
+    margin-bottom: 15px;
+    span {
+      @include singleLineEllipsis();
+      @include font-type($bwt_scopeFontFamily, 12px);
+      width: calc(100% - 120px);
+      color: $bwt_darkGray40Color;
+    }
+  }
+
+  .messageTitle {
+    span {
+      @include singleLineEllipsis();
+      @include font-type($bwt_semiboldFontFamily, 14px);
+      width: calc(100% - 120px);
+    }
+  }
+
+  .messageSubject {
+    margin-top: 8px;
+    @include singleLineEllipsis();
+  }
+  .messageDescription {
+    max-height: 0;
+    height: auto;
+    overflow: hidden;
+    transition: max-height 0.2s cubic-bezier(0, 1, 0, 1);
+    cursor: auto;
+    .descriptionHeader {
+      margin-top: 12px;
+      @include font-type($bwt_semiboldFontFamily, 14px);
+    }
+    .description {
+      margin-top: 8px;
+    }
+
+    &.showDesc {
+      max-height: 100vh;
+      transition: max-height 0.2s ease-in-out;
+    }
+    a {
+      color: $bwt_primaryTealColor;
+      cursor: pointer;
+    }
+  }
+
+  .messageActions {
+    position: absolute;
+    right: 16px;
+    bottom: 8px;
+    background: $bwt_white;
+    display: none;
+
+    > i {
+      @include displayIB();
+      padding: 8px;
+      color: $bwt_darkGray30Color;
+      font-size: $bwt_smallIconSize;
+
+      &:hover {
+        background: $bwt_lightGray40Color;
+      }
+    }
+  }
+
+  .showActions {
+    position: static;
+    float: right;
+    display: block;
+  }
+
+  &.messageRead {
+    &:before {
+      content: " ";
+      position: absolute;
+      width: 3px;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: $bwt_primaryTealColor;
+      border-radius: 2px 0 0 2px;
+    }
+    .messageActions {
+      .messageUnreadIcon,
+      .messageReadIcon,
+      .messageDeleteIcon {
+        z-index: 10000000;
+      }
+    }
+  }
+
+  &:hover {
+    .messageSubject {
+      width: calc(100% - 74px);
+    }
+
+    .messageActions {
+      display: inline-block;
+    }
+  }
+}
+
+.rightSidePanelHeader {
+  padding: 16px 16px 0;
+  display: flex;
+  justify-content: space-between;
+
+  .panelHeaderTitle {
+    @include font-type($bwt_semiboldFontFamily, $bwt_mediumIconSize);
+  }
+}
+
+.profileBottomLinks {
+  .linkButton {
+    height: 16px;
+    line-height: 10px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  a {
+    height: 16px;
+    display: block;
+    line-height: 10px;
+  }
+}
+
+.accountList {
+  margin-top: 10px;
+  width: 100%;
+  position: relative;
+  .personaCard {
+    width: 100%;
+    position: relative;
+  }
+  .accountPersona {
+    @include singleLineEllipsis;
+    padding: 4px 0;
+    height: 44px;
+    float: left;
+    width: 264px;
+  }
+  .accountOverFlow {
+    position: absolute;
+    right: 0;
+    top: 8px;
+    width: 40px;
+  }
+  .accountMenu {
+    .ms-CommandBar {
+      padding: 0px;
+      i {
+        transform: rotate(90deg);
+      }
+    }
+  }
+}
+
+.noGscAccounts {
+  @include font-type($bwt_scopeFontFamily, $bwt_secondaryFontSize);
+  margin-top: 10px;
+  color: $bwt_secondaryTextColor;
+}
+
+.bwtAccordionAnim-enter {
+  max-height: 0;
+}
+
+.bwtAccordionAnim-enter.bwtAccordionAnim-enter-active {
+  max-height: 550px;
+  transition: max-height 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bwtAccordionAnim-leave {
+  max-height: 550px;
+}
+
+.bwtAccordionAnim-leave.bwtAccordionAnim-leave-active {
+  max-height: 0;
+  transition: max-height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 639px) {
+  .notificationsFilter {
+    .notificationFilterDropdown {
+      width: 100%;
+    }
+
+    .toggleButton {
+      float: left;
+    }
+  }
+
+  .messageCard {
+    .messageSubject {
+      width: calc(100% - 74px);
+    }
+
+    .messageActions {
+      display: inline-block;
+    }
+  }
+}

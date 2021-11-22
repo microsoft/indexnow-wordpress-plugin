@@ -1,0 +1,93 @@
+@import "./default";
+
+.bw-StartPageContent {
+  text-align: center;
+  border: 1px solid $bwt_lightGray60Color;
+  margin-top: 25px;
+
+  .featuresSection {
+    padding: 1.5rem 0;
+    background-color: $bwt_lightGray30Color;
+
+    h2 {
+      color: $bwt_darkGray20Color;
+      padding: 1rem 0;
+    }
+
+    .featuresListContainer {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-evenly;
+    }
+
+    .featureItem {
+      max-width: 8rem;
+      margin: 0 4px;
+      margin: 1rem 1rem;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+
+      .featureIcon {
+        color: $bwt_darkGray20Color;
+        font-size: 1.5rem;
+      }
+
+      p {
+        color: $bwt_darkGray20Color;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  .keyEntrySection {
+    background-color: $bwt_white;
+    padding: 5rem 0rem;
+    display: flex;
+    justify-content: center;
+    padding: 5px 24px;
+
+    .keyEntryCard {
+      max-width: 400px;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      padding: 24px 0;
+
+      h3 {
+        font-size: 26px;
+        color: $bwt_cardTextColor;
+      }
+
+      >* {
+        margin: 8px 0;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .apiKeyTextField {
+        input {
+          border-radius: 0;
+          border: none;
+          min-height: auto;
+        }
+
+        p {
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+
+
+      button.submitButton {
+        background-color: $bwt_primaryTealColor;
+        color: $bwt_white;
+        border-radius: 0;
+        width: 300px;
+      }
+    }
+  }
+}

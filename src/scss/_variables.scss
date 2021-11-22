@@ -1,0 +1,118 @@
+﻿// Variables
+//
+// Variables should follow the `$shortansname-propertynameincamelcase` formula for
+// consistent naming. Ex: $bingtravel-linkDisabledColor and $bwt_contentBoxShadow.
+
+//
+// Color system
+//
+
+// Primary Colors
+$bwt_white: #ffffff;
+$bwt_primaryTealColor: #00809d;
+$bwt_darkTealColor: #006887;
+
+// Secondary Color
+$bwt_headerAccentColor: #0046ff;
+$bwt_attributionColor: #006d21;
+$bwt_warningColor: #be5a00;
+$bwt_errorColor: #c80000;
+$bwt_pendingColor: #797673;
+$bwt_successColor: #006d21;
+
+// Text colors
+$bwt_primaryTextColor: #444444;
+$bwt_standardTextColor: #666666;
+$bwt_secondaryTextColor: #767676;
+$bwt_optionalTextColor: #919191;
+$bwt_linkTextColor: #0078d7;
+$bwt_harmfulLinkIconColor: #e06f6a;
+
+// Gray Colors
+$bwt_lightGray10Color: #f7f9f8;
+$bwt_lightGray15Color: #f8f8f8;
+$bwt_lightGray20Color: #f9f9f9;
+$bwt_lightGray30Color: #f5f5f5;
+$bwt_lightGray40Color: #f3f3f3;
+$bwt_lightGray50Color: #ececec;
+$bwt_lightGray60Color: #dddddd;
+$bwt_lightGray70Color: #cccccc;
+$bwt_darkGray10Color: #919191;
+$bwt_darkGray20Color: #767676;
+$bwt_darkGray30Color: #666666;
+$bwt_darkGray40Color: #444444;
+$bwt_darkGray50Color: #111111;
+$bwt_whiteGrayBlack: #e1e1e1;
+$bwt_veryDarkGrayColor: #212121;
+$bwt_darkCyanColor: #0c8484;
+$bwt_veryDarkCyanColor: #0c6e6e;
+$bwt_buttonActiveColor: #0b5858;
+$bwt_filterBorderColor: #a19f9d;
+$bwt_paginationButtonColor: #eaeaea;
+$bwt_paginationButtonDisabledColor: #f4f4f4;
+$bwt_buttonHoverColor: #027c91;
+$bwt_cardTextColor: #333333;
+$bwt_textFiledBorderColor: #a19f9d;
+$bwt_buttonClassicPortalLinkBackgroundColor: #fff5d5;
+$bwt_buttonClassicPortalLinkBorderColor: #ba7b17;
+
+$bwt_headerLinkTextColor: #0078d4;
+$bwt_headerTitleSupTextBackGroundColor: #00b7c8;
+$bwt_headerElementsHoverBackGroundColor: #00748e;
+$bwt_filterButtonsHoverBackGroundColor: #edebe9;
+$bwt_attributionHoverBackGroundColor: #00631e;
+$bwt_errorHoverBackGroundColor: #b30000;
+$bwt_filterButtonHoverColor: #605e5c;
+$bwt_navHoverColor: rgba(0, 128, 150, 0.1);
+$bwt_navHoverAfterColor: rgba(0, 128, 150, 0.01);
+$bwt_navButtonHoverBackground: #f3f2f1;
+$bwt_rowHoverColor: rgb(243, 242, 241);
+
+// Font faces
+$bwt_scopeFontFamily: "Segoe UI", Arial, Helvetica, Sans-Serif;
+$bwt_semiboldFontFamily: "Segoe UI Semibold", "Segoe UI", Arial, Helvetica,
+  Sans-Serif;
+$bwt_bodyFontFamily: Arial, Helvetica, Sans-Serif;
+
+// Font sizes
+$bwt_focusTitleMFontSize: 44px;
+$bwt_titleFontSize: 24px;
+$bwt_focusFontSize: 20px;
+$bwt_mediumFontSize: 16px;
+$bwt_standardFontSize: 14px;
+$bwt_secondaryFontSize: 12px;
+
+// Width
+$bwt_pageMinWidth: 1266px;
+$bwt_pageContentWidth: 960px;
+
+// Heights
+$bwt_topHeaderHeight: 54px;
+
+// Borders
+$bwt_lightGrayBorder: 1px solid $bwt_lightGray60Color;
+$bwt_whiteBorder: 1px solid $bwt_white;
+$bwt_filterBoxBorder: 1px solid $bwt_filterBorderColor;
+$bwt_transparentBorder: 1px solid transparent;
+$bwt_pageHeaderBorder: 1px solid $bwt_whiteGrayBlack;
+$bwt_pageTitleBorder: 1px solid $bwt_lightGray70Color;
+$bwt_filterButtonHoverBorder: 1px solid $bwt_filterButtonHoverColor;
+
+// Shadows
+$bwt_cardShadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+$bwt_hoverShadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+$bwt_btnhoverShadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+$bwt_messageCardShadow: rgba(0, 0, 0, 0.133) 0px 1.6px 3.6px 0px,
+  rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
+$bwt_messageCardHoverShadow: rgba(0, 0, 0, 0.133) 0px 3.2px 7.2px 0px,
+  rgba(0, 0, 0, 0.11) 0px 0.6px 1.8px 0px;
+
+// Transitions
+$bwt_shadowTransition: box-shadow 0.1s ease-in-out;
+$bwt_cardExpandTransition: all 0.3s ease-in-out;
+
+// Icon sizes
+$bwt_smallIconSize: 16px;
+$bwt_mediumIconSize: 20px;
+$bwt_largeIconSize: 24px;
+$bwt_xlargeIconSize: 32px;

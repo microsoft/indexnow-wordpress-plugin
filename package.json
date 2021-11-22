@@ -1,0 +1,48 @@
+{
+  "dependencies": {
+    "@fluentui/react": "^7.146.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.8",
+    "@types/react": "^16.9.52",
+    "@uifabric/react-hooks": "^7.13.6",
+    "date-fns": "^2.16.1",
+    "hosted-git-info": "^2.8.9",
+    "lodash": "^4.17.21",
+    "node-sass": "^4.13.1",
+    "react": "^16.14.0",
+    "react-dev-utils": "^11.0.4",
+    "react-dom": "^16.14.0",
+    "react-scripts": "^4.0.3",
+    "typescript": "^4.0.3",
+    "url-parse": "^1.5.0",
+    "y18n": "^4.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "clean": "rimraf build publish",
+    "zip": "mkdir publish && cd build/ && copy ..\\*.md . && copy ..\\LICENSE.txt . && rimraf index.html && bestzip ../publish/plugin.zip *"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "bestzip": "^2.1.7",
+    "rimraf": "^3.0.2"
+  }
+}

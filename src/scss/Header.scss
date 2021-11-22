@@ -1,0 +1,63 @@
+@import "./default";
+
+// Page header css
+.bw-Header {
+  width: 100%;
+  background: $bwt_primaryTealColor;
+  color: $bwt_white;
+  padding-left: calc((100% - #{$bwt_pageContentWidth})/2);
+  padding-right: calc((100% - #{$bwt_pageContentWidth})/2);
+
+  .headerLeftElements {
+    > * {
+      vertical-align: middle;
+    }
+  }
+
+  .headerRightElements {
+    > * {
+      vertical-align: middle;
+      line-height: $bwt_topHeaderHeight;
+      cursor: pointer;
+      font-size: 12px;
+
+      .bw-Icon {
+        color: $bwt_white;
+        vertical-align: middle;
+      }
+
+      span {
+        padding: 0 8px;
+      }
+    }
+  }
+
+  .bingLogo {
+    margin: 0 16px 0 0;
+    border-right: $bwt_pageTitleBorder;
+    padding-right: 16px;
+    height: 42px;
+  }
+
+  .bingLogoMobile {
+    padding-right: 8px;
+  }
+
+  .pageTitle {
+    @include font-type($bwt_semiboldFontFamily, $bwt_mediumFontSize);
+    color: $bwt_white;
+    line-height: $bwt_topHeaderHeight;
+    sup {
+      @include border-radius(2px);
+      font-size: 10px;
+      font-weight: 600;
+      bottom: 5px;
+      position: relative;
+      background-color: $bwt_headerTitleSupTextBackGroundColor;
+      margin-left: 6px;
+      padding: 2px 8px;
+      text-align: center;
+      vertical-align: super;
+    }
+  }
+}
