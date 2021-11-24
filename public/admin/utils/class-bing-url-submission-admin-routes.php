@@ -325,7 +325,7 @@ class Bing_Webmaster_Admin_Routes {
 		);
 
 			$response = wp_remote_post(
-				'www.indexnow.org/',
+				'www.bing.com/indexnow/',
 				array(
 					'body'    => $data,
 					'headers' => array( 'Content-Type' => 'application/json' ),
@@ -442,12 +442,13 @@ class Bing_Webmaster_Admin_Routes {
 
 	private function call_get_api_key( $request ) {
 		$admin_api_key = get_option($this->prefix . "admin_api_key");
+
 		$api_key = base64_decode($admin_api_key);
 		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
-			if ( ! $admin_api_key || empty($admin_api_key) || !$is_valid_api_key) {
+			if ( ! $admin_api_key || empty($admin_api_key) || !$is_valid_api_key || $is_valid_api_key == '2') {
 				return new \WP_REST_Response( array(
 					'hasAPIKey' => false,
-					'APIKey' => ''
+					'APIKey' => $api_key
 				), 200 );
 			}
 
@@ -464,24 +465,15 @@ class Bing_Webmaster_Admin_Routes {
 			if (isset($json->APIKey) && !empty($json->APIKey)) {
 				$apiKey = sanitize_text_field($json->APIKey);
 				if (preg_match('/^[a-f0-9]{32}$/i', $json->APIKey)) {
-					$response = $this->check_bwt_api_key($apiKey);
-
-					if (substr($response, 0, 6) != "error:") {
-						// get the lastest options to avoid inconsistency
-						update_option($this->prefix . 'admin_api_key', base64_encode($apiKey));
-						update_option($this->prefix . 'is_valid_api_key', "1");
-						update_option($this->prefix . 'auto_submission_enabled', "1");
-						return new \WP_REST_Response( array(
-							'error_type' => WPErrors::NoError
-							), 200 );
-					}
-					else {
-						$message = substr($response, 6);
-						$error_type = $this->get_api_error($message, true);
-						return new \WP_REST_Response( array(
-							'error_type' => $error_type
-							), 200 );
-					}
+					
+					// get the lastest options to avoid inconsistency
+					update_option($this->prefix . 'admin_api_key', base64_encode($apiKey));
+					update_option($this->prefix . 'is_valid_api_key', "1");
+					update_option($this->prefix . 'auto_submission_enabled', "1");
+					return new \WP_REST_Response( array(
+						'error_type' => WPErrors::NoError
+						), 200 );
+					
 				}
 				else {
 					return new \WP_REST_Response( array(

@@ -91,18 +91,18 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   const [apiKeyUpdated, setApiKeyUpdated] = useState<number>(0);
 
   // Check if API key is valid
-  useEffect(() => {
-    Promise.resolve(CheckApiKeyValidity()).then((response) => {
-      if (response && response.data) {
-        if (response.data.error_type.length !== 0) {
-          props.addBanner(
-            "API Key Validation Error: Please check if site is verified or API key is valid to enable Automatic & Manual URL submission."
-          );
-          setApiKeyInvalid(true);
-        }
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   Promise.resolve(CheckApiKeyValidity()).then((response) => {
+  //     if (response && response.data) {
+  //       if (response.data.error_type.length !== 0) {
+  //         props.addBanner(
+  //           "API Key Validation Error: Please check if site is verified or API key is valid to enable Automatic & Manual URL submission."
+  //         );
+  //         setApiKeyInvalid(true);
+  //       }
+  //     }
+  //   });
+  // }, []);
 
   // Get API settings
   useEffect(() => {
