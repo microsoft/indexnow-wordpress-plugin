@@ -323,9 +323,9 @@ class Bing_Webmaster_Admin_Routes {
 				 'urlList'     => array( $url ),
 			)
 		);
-
+		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) error_log($data);
 			$response = wp_remote_post(
-				'www.bing.com/indexnow/',
+				'https://www.bing.com/indexnow/',
 				array(
 					'body'    => $data,
 					'headers' => array( 'Content-Type' => 'application/json' ),
