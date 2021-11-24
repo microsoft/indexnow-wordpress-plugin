@@ -48,7 +48,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
 
   const [apiKeyInvalid, setApiKeyInvalid] = useState<boolean>(false);
   const [apiSettings, setAPISettings] = useState<IGetApiSettingsResponse>();
-  // const [submissionStats, setSubmissionStats] = useState<IGetStatsResponse>();
+  const [submissionStats, setSubmissionStats] = useState<IGetStatsResponse>();
   const [submissionsList, setSubmissionsList] = useState<
     IGetAllSubmissionsResponse
   >();
@@ -117,13 +117,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   }, [apiKeyUpdated, apiSettingsUpdated]);
 
   // Get submissions statistics
-  // useEffect(() => {
-  //   Promise.resolve(GetStats()).then((response) => {
-  //     if (response && response.data && response.data.error_type.length === 0) {
-  //       setSubmissionStats(response.data);
-  //     }
-  //   });
-  // }, [apiKeyUpdated, urlSubmitted]);
+  useEffect(() => {
+    Promise.resolve(GetStats()).then((response) => {
+      if (response && response.data && response.data.error_type.length === 0) {
+        setSubmissionStats(response.data);
+      }
+    });
+  }, [apiKeyUpdated, urlSubmitted]);
 
   // Get submissions list
   useEffect(() => {
@@ -442,10 +442,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         </div>
 
-        {/* <h2 className="sectionTitle">Overview</h2>
+        <h2 className="sectionTitle">Overview</h2>
         <div className="bw-CardRow">
           <div className="bw-OverviewSection">
-            <div className="infoCards">
+            {/* <div className="infoCards">
               <h4>Quota left for the day</h4>
               <h2>
                 {submissionStats && submissionStats.Quota !== null
@@ -453,7 +453,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                   : "-"}
               </h2>
               <p>(Resets at 00:00 GMT)</p>
-            </div>
+            </div> */}
             <div className="infoCards">
               <h4>Successful submissions</h4>
               <h2>
@@ -475,7 +475,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               <p>In last 48 hours</p>
             </div>
           </div>
-        </div> */}
+        </div>
 
         <div className="sectionTitleContainer">
           <h2 className="sectionTitle">URLs submitted</h2>
