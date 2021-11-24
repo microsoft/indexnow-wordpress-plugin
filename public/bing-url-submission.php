@@ -9,7 +9,7 @@
  * Plugin Name:       Index Now Url Submission
  * Plugin URI:        https://www.bing.com/webmaster
  * Description:       A small plugin to allow Url submissions to Bing Webmaster Tools.
- * Version:           1.0.15
+ * Version:           1.0.0
  * Author:            Bing Webmaster
  * Author URI:        https://www.bing.com/webmaster
  * License:           GPL-2.0+
@@ -26,19 +26,21 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Currently plugin version.
  */
-define( 'BWT_URL_SUBMISSION_PLUGIN_VERSION', '1.0.15' );
+
+define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.0' );
 
 /**
  * Plugin name.
  */
-define( 'BWT_URL_SUBMISSION_PLUGIN_NAME', 'index-now-submission' );
+
+define( 'BWT_INDEXNOW_PLUGIN_NAME', 'indexnow-url-submission' );
 
 /**
  * The code that runs during plugin activation.
  */
 function activate_bing_webmaster_url_submission() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-bing-url-submission-activator.php';
-	Bing_Webmaster_Activator::activate(BWT_URL_SUBMISSION_PLUGIN_NAME);
+	Bing_Webmaster_Activator::activate(BWT_INDEXNOW_PLUGIN_NAME);
 }
 
 /**
@@ -46,7 +48,7 @@ function activate_bing_webmaster_url_submission() {
  */
 function deactivate_bing_webmaster_url_submission() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-bing-url-submission-deactivator.php';
-	Bing_Webmaster_Deactivator::deactivate(BWT_URL_SUBMISSION_PLUGIN_NAME);
+	Bing_Webmaster_Deactivator::deactivate(BWT_INDEXNOW_PLUGIN_NAME);
 }
 
 register_activation_hook( __FILE__, 'activate_bing_webmaster_url_submission' );
@@ -64,7 +66,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-bing-url-submission.php';
  */
 function run_bing_webmaster_url_submission() {
 
-	$plugin = new Bing_Webmaster(BWT_URL_SUBMISSION_PLUGIN_NAME);
+	$plugin = new Bing_Webmaster(BWT_INDEXNOW_PLUGIN_NAME);
 	$plugin->run();
 
 }

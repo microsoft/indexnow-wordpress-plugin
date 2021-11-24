@@ -19,6 +19,7 @@ class Bing_Webmaster_Activator {
 	public static function activate($plugin_name) {
 		self::add_failed_submissions_table();
 		self::add_passed_submissions_table();
+		Bing_Webmaster_Admin_Utils::generate_indexnow_key();
 	}
 
 	public static function add_passed_submissions_table() {

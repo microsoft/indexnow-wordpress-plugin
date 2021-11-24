@@ -108,6 +108,15 @@ class Bing_Webmaster_Admin_Utils {
 	public static function is_localhost( $ip = array( '127.0.0.1', '::1' ) ) {
 		return in_array( $_SERVER['REMOTE_ADDR'], $ip );
 	}
+
+	public  static function generate_indexnow_key() 
+	{
+		$api_key = wp_generate_uuid4();
+		$api_key = preg_replace('[-]', '', $api_key);
+		error_log($api_key);
+		update_option(self::$prefix . 'admin_api_key', base64_encode($api_key));
+		update_option( self::$prefix . 'is_valid_api_key', true );
+	}
 }
 
 class SubmissionCount {
