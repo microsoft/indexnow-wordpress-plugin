@@ -188,30 +188,30 @@ class Bing_Webmaster_Admin_Routes {
 		return $this->try_catch(array($request, array($this, 'call_delete_submissions')), array($this, 'validate_api_key'));
 	}
 
-	private function get_site_quota($api_key, $siteUrl)
-	{
-		$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/GetUrlSubmissionQuota?apikey=" . $api_key . "&siteUrl=" . $siteUrl . "&client=wp_v_" . $this->version );
+	// private function get_site_quota($api_key, $siteUrl)
+	// {
+	// 	$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/GetUrlSubmissionQuota?apikey=" . $api_key . "&siteUrl=" . $siteUrl . "&client=wp_v_" . $this->version );
 
-		if (is_wp_error( $response )) {
-			if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-				error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
-			}
-			return -1;
-		}
-		if (isset($response['errors'])) {
-			return -1;
-		}
-		try {
-			if ($response['response']['code'] === 200) {
-				$message = json_decode($response['body'])->{'d'}->{'DailyQuota'};
-				return $message;
-			} else {
-				return -1;
-			}
-		} catch (\Throwable $th) {
-			return -1;
-		}
-	}
+	// 	if (is_wp_error( $response )) {
+	// 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
+	// 			error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
+	// 		}
+	// 		return -1;
+	// 	}
+	// 	if (isset($response['errors'])) {
+	// 		return -1;
+	// 	}
+	// 	try {
+	// 		if ($response['response']['code'] === 200) {
+	// 			$message = json_decode($response['body'])->{'d'}->{'DailyQuota'};
+	// 			return $message;
+	// 		} else {
+	// 			return -1;
+	// 		}
+	// 	} catch (\Throwable $th) {
+	// 		return -1;
+	// 	}
+	// }
 
 	private function check_bwt_api_key( $api_key ) {
 		$siteUrl = get_home_url();
@@ -302,7 +302,6 @@ class Bing_Webmaster_Admin_Routes {
 	/**
 	 * Removes scheme/protocol from thr url.
 	 *
-	 * @since 5.9.0
 	 */
 	private function remove_scheme( $url ) {
 		if ( 'http://' === substr( $url, 0, 7 ) ) {
@@ -343,23 +342,22 @@ class Bing_Webmaster_Admin_Routes {
 			}
 			return "error:WP_Error";
 		}
-		if (isset($response['errors'])) {
-			return "error:RequestFailed";
+		if ( isset( $response['errors'] ) ) {
+			return 'error:RequestFailed';
 		}
 		try {
-			if ($response['response']['code'] === 200) {
-				return "success";
+			if ( 200 === $response['response']['code'] ) {
+				return 'success';
 			} else {
-				if ($response['response']['code'] >= 500) {
-					return "error:" . $response['response']['message'];
+				if ( $response['response']['code'] >= 500 ) {
+					return 'error:' . $response['response']['message'];
 				} else {
-					$message = json_decode($response['body'])->{'Message'};
-					return "error:" . $message;
+					$message = json_decode( $response['body'] );
+					return 'error:' . $message;
 				}
 			}
-		}
-		catch (\Throwable $th) {
-			return "error:RequestFailed";
+		} catch ( \Throwable $th ) {
+			return 'error:RequestFailed';
 		}
 	}
 
@@ -444,17 +442,18 @@ class Bing_Webmaster_Admin_Routes {
 
 	private function call_get_api_key( $request ) {
 		$admin_api_key = get_option($this->prefix . "admin_api_key");
-
-			if ( ! $admin_api_key || empty($admin_api_key)) {
+		$api_key = base64_decode($admin_api_key);
+		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
+			if ( ! $admin_api_key || empty($admin_api_key) || !$is_valid_api_key) {
 				return new \WP_REST_Response( array(
 					'hasAPIKey' => false,
-					'APIKey' => '3609157db12c4ab7b14450bb90c303fa'
+					'APIKey' => ''
 				), 200 );
 			}
 
 			return new \WP_REST_Response( array(
 				'hasAPIKey' => true,
-				'APIKey' => '3609157db12c4ab7b14450bb90c303fa'
+				'APIKey' => $api_key
 			), 200 );
 	}
 
@@ -611,15 +610,15 @@ class Bing_Webmaster_Admin_Routes {
 		// save the options, incase they got updated
 		update_option( $this->prefix . 'failed_count', $failed_count );
 		update_option( $this->prefix . 'passed_count', $passed_count );
-		$quota = -1;
-		if ($is_valid_api_key && $is_valid_api_key === "1") {
-			$siteUrl = get_home_url();
-			$quota = $this->get_site_quota(base64_decode($admin_api_key), $siteUrl);
-		}
+		// $quota = -1;
+		// if ($is_valid_api_key && $is_valid_api_key === "1") {
+		// 	$siteUrl = get_home_url();
+		// 	$quota = $this->get_site_quota(base64_decode($admin_api_key), $siteUrl);
+		// }
 		return new \WP_REST_Response( array(
 			'FailedSubmissionCount' => $fail_count,
 			'PassedSubmissionCount' => $pass_count,
-			'Quota' => $quota,
+			// 'Quota' => $quota,
 			'error_type' => WPErrors::NoError
 			), 200 );
 	}

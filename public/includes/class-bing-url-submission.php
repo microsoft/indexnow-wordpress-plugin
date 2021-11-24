@@ -52,10 +52,12 @@ class Bing_Webmaster {
 	 * @since    0.01.01
 	 */
 	public function __construct($plugin_name) {
-		if ( defined( 'BWT_URL_SUBMISSION_PLUGIN_VERSION' ) ) {
-			$this->version = BWT_URL_SUBMISSION_PLUGIN_VERSION;
+		if ( defined( 'BWT_INDEXNOW_PLUGIN_VERSION' ) ) {
+			$this->version = BWT_INDEXNOW_PLUGIN_VERSION;
 		} else {
-			$this->version = '1.0.15';
+
+			$this->version = '1.0.0';
+
 		}
 		$this->plugin_name = $plugin_name;
 
