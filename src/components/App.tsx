@@ -5,6 +5,7 @@ import "../scss/App.scss";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { GetApiKey } from "./withDashboardData";
+import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/components/Spinner";
 
 import { Header } from "./Header";
 import { StartPage } from "./StartPage";
@@ -13,13 +14,14 @@ import { Icon } from "@fluentui/react/lib/Icon";
 
 export const App: React.FunctionComponent = () => {
   const [hasAPIKey, setHasAPIKey] = useState(false);
-
+  const [showLoading, setShowLoading] = useState(true);
   // variable to store banners
   const [bannerList, setBannerList] = useState<string[]>([]);
 
   useEffect(() => {
     const data = Promise.resolve(GetApiKey());
     data.then((response) => {
+      setShowLoading(false);
       if (response && response.data) {
         setHasAPIKey(response.data.hasAPIKey);
       }
@@ -66,16 +68,26 @@ export const App: React.FunctionComponent = () => {
             </div>
           );
         })}
-        {!hasAPIKey && (
-          <StartPage
-            addBanner={addBanner}
-            setAPIKeyAdded={() => {
-              setHasAPIKey(true);
-              setBannerList([]);
-            }}
-          />
-        )}
-        {hasAPIKey && <Dashboard addBanner={addBanner} />}
+        {showLoading &&
+          <div>
+            <Spinner
+              size={SpinnerSize.large}
+              className="maskSpinner"
+            />
+          </div>}
+        {!showLoading &&
+          <div>
+            {!hasAPIKey && (
+              <StartPage
+                addBanner={addBanner}
+                setAPIKeyAdded={() => {
+                  setHasAPIKey(true);
+                  setBannerList([]);
+                }}
+              />
+            )}
+            {hasAPIKey && <Dashboard addBanner={addBanner} />}
+          </div>}
       </div>
     </div>
   );
