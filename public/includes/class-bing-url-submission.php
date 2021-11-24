@@ -55,7 +55,7 @@ class Bing_Webmaster {
 		if ( defined( 'BWT_URL_SUBMISSION_PLUGIN_VERSION' ) ) {
 			$this->version = BWT_URL_SUBMISSION_PLUGIN_VERSION;
 		} else {
-			$this->version = '1.0.12';
+			$this->version = '1.0.15';
 		}
 		$this->plugin_name = $plugin_name;
 

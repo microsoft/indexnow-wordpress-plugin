@@ -4,6 +4,7 @@ interface ApiResponse {
 
 export interface IGetApiKeyResponse extends ApiResponse {
   hasAPIKey: boolean;
+  APIKey : string;
 }
 
 export interface ISetApiKeyRequest {

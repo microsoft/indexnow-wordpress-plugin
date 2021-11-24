@@ -447,12 +447,14 @@ class Bing_Webmaster_Admin_Routes {
 
 			if ( ! $admin_api_key || empty($admin_api_key)) {
 				return new \WP_REST_Response( array(
-					'hasAPIKey' => false
+					'hasAPIKey' => false,
+					'APIKey' => '3609157db12c4ab7b14450bb90c303fa'
 				), 200 );
 			}
 
 			return new \WP_REST_Response( array(
-				'hasAPIKey' => true
+				'hasAPIKey' => true,
+				'APIKey' => '3609157db12c4ab7b14450bb90c303fa'
 			), 200 );
 	}
 
