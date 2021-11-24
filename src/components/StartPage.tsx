@@ -1,12 +1,13 @@
 import "../scss/StartPage.scss";
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PrimaryButton } from "@fluentui/react/lib/Button";
 import { Icon } from "@fluentui/react/lib/Icon";
 import { TextField } from "@fluentui/react/lib/TextField";
 import { SetApiKey } from "./withDashboardData";
 import { ApiKeyRegex, StringConstants } from "../Constants";
+import { GetApiKey } from "./withDashboardData";
 
 interface IStartPage {
   addBanner: (str: string) => void;
@@ -25,6 +26,15 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
       }
     });
   };
+
+  useEffect(() => {
+    const data = Promise.resolve(GetApiKey());
+    data.then((response) => {
+      if (response && response.data) {
+        setApiKey(String (response.data.APIKey));
+      }
+    });
+  }, []);
 
   return (
     <div className="bw-StartPageContent">
@@ -64,7 +74,8 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
             if needed.
           </p>
           <TextField
-            type="password"
+            // type="password"
+            readOnly={true}
             className="apiKeyTextField"
             value={apiKey}
             onChange={(event, item) => {

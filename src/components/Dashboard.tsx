@@ -13,6 +13,7 @@ import {
   UpdateAutoSubmissionsEnabled,
   SetApiKey,
   CheckApiKeyValidity,
+  GetApiKey
 } from "./withDashboardData";
 import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
 import {
@@ -31,6 +32,7 @@ import {
 } from "./Interfaces";
 import { Card } from "./Card";
 import { StringConstants, ApiKeyRegex, SubmitUrlRegex } from "../Constants";
+import { tr } from "date-fns/locale";
 
 interface IDashboardProps {
   addBanner: (str: string) => void;
@@ -46,7 +48,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
 
   const [apiKeyInvalid, setApiKeyInvalid] = useState<boolean>(false);
   const [apiSettings, setAPISettings] = useState<IGetApiSettingsResponse>();
-  const [submissionStats, setSubmissionStats] = useState<IGetStatsResponse>();
+  // const [submissionStats, setSubmissionStats] = useState<IGetStatsResponse>();
   const [submissionsList, setSubmissionsList] = useState<
     IGetAllSubmissionsResponse
   >();
@@ -75,6 +77,14 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   >("");
   const [textFieldValueApiKey, setTextFieldValueApiKey] = useState<string>("");
 
+  useEffect(() => {
+    const data = Promise.resolve(GetApiKey());
+    data.then((response) => {
+      if (response && response.data) {
+        setTextFieldValueApiKey(String (response.data.APIKey));
+      }
+    });
+  }, []);
   // variables to trigger UI data refresh
   const [urlSubmitted, setUrlSubmitted] = useState<number>(0);
   const [apiSettingsUpdated, setApiSettingsUpdated] = useState<number>(0);
@@ -107,13 +117,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   }, [apiKeyUpdated, apiSettingsUpdated]);
 
   // Get submissions statistics
-  useEffect(() => {
-    Promise.resolve(GetStats()).then((response) => {
-      if (response && response.data && response.data.error_type.length === 0) {
-        setSubmissionStats(response.data);
-      }
-    });
-  }, [apiKeyUpdated, urlSubmitted]);
+  // useEffect(() => {
+  //   Promise.resolve(GetStats()).then((response) => {
+  //     if (response && response.data && response.data.error_type.length === 0) {
+  //       setSubmissionStats(response.data);
+  //     }
+  //   });
+  // }, [apiKeyUpdated, urlSubmitted]);
 
   // Get submissions list
   useEffect(() => {
@@ -337,11 +347,11 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                   <li
                     onClick={() => {
                       // reset UI controls and display modal
-                      setTextFieldValueApiKey("");
+                     // setTextFieldValueApiKey("");
                       setModalState(DashboardModalState.UpdateApiKeyModal);
                     }}
                   >
-                    Update key
+                    Show key
                   </li>
                 </ul>
               </div>
@@ -432,7 +442,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         </div>
 
-        <h2 className="sectionTitle">Overview</h2>
+        {/* <h2 className="sectionTitle">Overview</h2>
         <div className="bw-CardRow">
           <div className="bw-OverviewSection">
             <div className="infoCards">
@@ -465,7 +475,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               <p>In last 48 hours</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="sectionTitleContainer">
           <h2 className="sectionTitle">URLs submitted</h2>
@@ -522,7 +532,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         {modalState === DashboardModalState.UpdateApiKeyModal && (
           <div className={"modalContainer bw-ModalUpdateApiKey"}>
             <div className="modalHeader">
-              <p className="modalTitle">Update API Key</p>
+              <p className="modalTitle">API Key</p>
               <Icon
                 iconName="ChromeClose"
                 className="bw-Icon modalClose"
@@ -533,6 +543,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             </div>
             <div className="modalContent">
               <TextField
+              readOnly = {true}
                 placeholder="Enter 32 digit API key"
                 className="textField"
                 value={textFieldValueApiKey}
@@ -547,15 +558,15 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                     : "";
                 }}
               />
-              <p>
+              {/* <p>
                 Don’t have API key?{" "}
                 <a href={StringConstants.ApiKeyHelpLink}>
                   Click here to know how to generate.
                 </a>
-              </p>
+              </p> */}
             </div>
             <div className="modalFooter">
-              <PrimaryButton
+              {/* <PrimaryButton
                 className="button primaryButton"
                 text="Update"
                 onClick={onClickUpdateApiKey}
@@ -563,10 +574,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                   !ApiKeyRegex.test(textFieldValueApiKey) ||
                   textFieldValueApiKey.length !== 32
                 }
-              />
+              /> */}
               <DefaultButton
                 className="button secondaryButton"
-                text="Cancel"
+                text="Got it"
                 onClick={() => {
                   setModalState(DashboardModalState.Hidden);
                 }}

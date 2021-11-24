@@ -6,10 +6,10 @@
  * @package           Bing_Webmaster
  *
  * @wordpress-plugin
- * Plugin Name:       Bing Webmaster Url Submission
+ * Plugin Name:       Index Now Url Submission
  * Plugin URI:        https://www.bing.com/webmaster
  * Description:       A small plugin to allow Url submissions to Bing Webmaster Tools.
- * Version:           1.0.12
+ * Version:           1.0.15
  * Author:            Bing Webmaster
  * Author URI:        https://www.bing.com/webmaster
  * License:           GPL-2.0+
@@ -26,12 +26,12 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Currently plugin version.
  */
-define( 'BWT_URL_SUBMISSION_PLUGIN_VERSION', '1.0.12' );
+define( 'BWT_URL_SUBMISSION_PLUGIN_VERSION', '1.0.15' );
 
 /**
  * Plugin name.
  */
-define( 'BWT_URL_SUBMISSION_PLUGIN_NAME', 'bing-url-submission' );
+define( 'BWT_URL_SUBMISSION_PLUGIN_NAME', 'index-now-submission' );
 
 /**
  * The code that runs during plugin activation.
