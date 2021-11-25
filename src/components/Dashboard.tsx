@@ -316,8 +316,8 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         }
       >
         <div className="bw-CardRow">
-          <div className="bw-CardColumn bw-CardColumn-2 bw-ApiKeyCard">
-            <Card
+          {/* <div className="bw-CardColumn bw-CardColumn-2 bw-ApiKeyCard"> */}
+            {/* <Card
               title="API Key"
               tooltip="API Key is a unique identifier that is used to authenticate API requests."
               leadingIconName="Permissions"
@@ -355,7 +355,30 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                   </li>
                 </ul>
               </div>
-            </div>
+            </div> */}
+             <div className="bw-CardColumn bw-CardColumn-2">
+            <Card
+              title="Manual URL submission"
+              tooltip="This feature allows you to submit a URL directly into the Bing index."
+              leadingIconName="Send"
+              className={apiKeyInvalid ? "bw-Disabled" : ""}
+            >
+              <p className="cardDescription">
+                This feature allows you to submit a URL directly into the Bing
+                index.
+              </p>
+              <DefaultButton
+                disabled={apiKeyInvalid}
+                onClick={() => {
+                  // reset UI controls and display modal
+                  setTextFieldValueUrlSubmit("");
+                  setModalState(DashboardModalState.SubmitUrlModal);
+                }}
+                style={{marginLeft : "26px"}}
+                className="button submitButton"
+                text="Submit URL"
+              />
+            </Card>
           </div>
 
           <div className="bw-CardColumn bw-CardColumn-2">
@@ -417,7 +440,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         </div>
 
         <div className="bw-CardRow">
-          <div className="bw-CardColumn bw-CardColumn-1 bw-ManualURLSubmissionCard">
+          {/* <div className="bw-CardColumn bw-CardColumn-1 bw-ManualURLSubmissionCard">
             <Card
               title="Manual URL submission"
               tooltip="This feature allows you to submit a URL directly into the Bing index."
@@ -439,10 +462,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                 text="Submit URL"
               />
             </Card>
-          </div>
+          </div> */}
         </div>
 
-        <h2 className="sectionTitle">Overview</h2>
+        {/* <h2 className="sectionTitle">Overview</h2> */}
         <div className="bw-CardRow">
           <div className="bw-OverviewSection">
             {/* <div className="infoCards">
@@ -454,8 +477,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               </h2>
               <p>(Resets at 00:00 GMT)</p>
             </div> */}
-            <div className="infoCards">
-              <h4>Successful submissions</h4>
+            <div className="bw-CardColumn bw-CardColumn-2">
+            <Card
+              title="Successful submissions"
+              leadingIconName={"Bullseye"}
+              tooltip={"Successful submissions "}
+            >
+              <p className="cardDescription">
               <h2>
                 {submissionStats &&
                 submissionStats.PassedSubmissionCount !== null
@@ -463,16 +491,25 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                   : "-"}
               </h2>
               <p>In last 48 hours</p>
+              </p>
+            </Card>
             </div>
-            <div className="infoCards">
-              <h4>Failed submissions</h4>
+            <div className="bw-CardColumn bw-CardColumn-2">
+            <Card
+              title="Failed submissions"
+              leadingIconName={"StatusErrorFull"}
+              tooltip={"Failed submissions "}
+            >
+              <p className="cardDescription">
               <h2>
-                {submissionStats &&
+              {submissionStats &&
                 submissionStats.FailedSubmissionCount !== null
                   ? submissionStats.FailedSubmissionCount
                   : "-"}
               </h2>
               <p>In last 48 hours</p>
+              </p>
+            </Card>
             </div>
           </div>
         </div>
@@ -485,7 +522,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               submissionsList?.Submissions.length === 0
             }
             onClick={downloadUrls}
-            className="buttonUrlSubmissionsDownload"
+            className="button submitButton"
             text="Download"
           />
         </div>
@@ -497,6 +534,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               columns={urlSubmissionTableColumns}
               selectionMode={SelectionMode.none}
               enableShimmer={submissionsList === undefined}
+              detailsListStyles={{root : {borderRadius : "12px"}}}
               ariaLabelForShimmer="Content is being fetched"
               ariaLabelForGrid="Item details"
               listProps={{ renderedWindowsAhead: 0, renderedWindowsBehind: 0 }}
@@ -516,11 +554,11 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             Maximum of 20 successful and 20 failed submissions in last 48hrs
             will be displayed.
           </p>
-          <p>
+          {/* <p>
             For more information, login to{" "}
             <a href={StringConstants.BingWebmasterLink}>Bing Webmaster Tools</a>
             .
-          </p>
+          </p> */}
         </div>
       </div>
       <div

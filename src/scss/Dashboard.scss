@@ -4,7 +4,7 @@
   margin-top: 25px;
 
   .sectionTitle {
-    font-size: 16px;
+    font-size: 18px;
     color: $bwt_cardTextColor;
     margin-top: 24px;
   }
@@ -44,7 +44,7 @@
       background-color: $bwt_white;
       position: relative;
       box-shadow: 0px 0.6px 2px #0000001c;
-      border-radius: 2px;
+      border-radius: 12px;
       display: flex;
 
       .bw-PopOverMenu {
@@ -103,7 +103,7 @@
         width: 100%;
 
         .cardTitle {
-          font-size: 16px;
+          font-size: 18px;
           color: $bwt_cardTextColor;
 
           .bw-CardTitleIcon {
@@ -122,7 +122,7 @@
         }
 
         .cardDescription {
-          font-size: 12px;
+          font-size: 13px;
           color: $bwt_standardTextColor;
           margin-left: 25px;
           margin-top: 10px;
@@ -211,18 +211,20 @@
   left: 30%;
   z-index: 1;
   box-shadow: -3px 6px 16px #00000029;
-  border-radius: 2px;
+  border-radius: 12px;
 
   .modalContainer {
     display: flex;
     flex-direction: column;
     background-color: $bwt_white;
+    border-radius: 12px;
 
     .modalHeader {
       padding: 24px 32px;
       color: $bwt_cardTextColor;
       display: flex;
       justify-content: space-between;
+      padding-bottom: 0px;
 
       p {
         font-size: 21px;
@@ -235,11 +237,13 @@
 
     .modalContent {
       padding: 24px 32px;
+      padding-top: 0px;
 
       .textField {
         input {
           border-radius: 0;
           border: none;
+          background-color: #f0f0f1;
         }
       }
 
@@ -259,7 +263,7 @@
       }
 
       button.primaryButton {
-        background-color: $bwt_primaryTealColor;
+        background-color: #0075D4;
         color: $bwt_white;
       }
 
