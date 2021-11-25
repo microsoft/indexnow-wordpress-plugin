@@ -67,7 +67,7 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
 
       <div className="keyEntrySection">
         <div className="keyEntryCard">
-          <h3>Add API Key To Get Started</h3>
+          {/* <h3>Add API Key To Get Started</h3>
           <p>
             Add valid API key and automate URL submission by clicking on Start
             using this plugin. You can disable auto submission later from plugin
@@ -94,11 +94,14 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
             <a href={StringConstants.ApiKeyHelpLink} target="_blank">
               Click here to know how to generate.
             </a>
+          </p> */}
+          <p>
+          IndexNow, Easy to use protocol that websites can call to notify whenever website contents on any URL is updated or created allowing instant crawling, and discovery of the URL
           </p>
           <div>
             <PrimaryButton
               className="button submitButton"
-              text="Start using plugin"
+              text="Let's Get Started!"
               onClick={onSubmitApiKey}
               disabled={!ApiKeyRegex.test(apiKey) || apiKey.length !== 32}
             />

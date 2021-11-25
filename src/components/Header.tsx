@@ -58,10 +58,10 @@ export const Header: React.FunctionComponent = () => {
     <>
       <header className="bw-Header">
         <div className="headerLeftElements floatLeft">
-          <span className="bingLogo desktopOnly">{logosvg}</span>
-          <span className="bingLogoMobile mobileOnly">{mobileLogoSvg}</span>
+          {/* <span className="bingLogo desktopOnly">{logosvg}</span> */}
+          {/* <span className="bingLogoMobile mobileOnly">{mobileLogoSvg}</span> */}
           <span className="pageTitle">
-            URL Submission plugin
+            Index Now Url Submission Plugin
           </span>
         </div>
         <div className="headerRightElements floatRight">

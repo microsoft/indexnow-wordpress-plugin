@@ -64,7 +64,9 @@
       }
 
       p {
-        font-size: 14px;
+        font-size: 15px;
+        font-style: oblique;
+        font-weight: 450;
       }
 
       .apiKeyTextField {
@@ -83,10 +85,11 @@
 
 
       button.submitButton {
-        background-color: $bwt_primaryTealColor;
+        background-color: #0075D4;
         color: $bwt_white;
         border-radius: 0;
         width: 300px;
+        font-size: 15px;
       }
     }
   }

@@ -5,7 +5,7 @@
  *
  * @package    Bing_Webmaster
  * @subpackage Bing_Webmaster/admin
- * @author     Bing Webmaster <bingwpus@microsoft.com>
+ * @author     Index Now <bingwpus@microsoft.com>
  */
 class Bing_Webmaster_Admin {
 
@@ -105,8 +105,8 @@ class Bing_Webmaster_Admin {
 		 * Add a menu page for this plugin.
 		 */
 		add_menu_page(
-			__('Bing Webmaster Tools Url Submission', $this->plugin_name),
-			__('Bing Webmaster', $this->plugin_name),
+			__('Index Now Tools Url Submission', $this->plugin_name),
+			__('Index Now', $this->plugin_name),
 			'manage_options',
 			$this->plugin_name,
 			array($this, 'display_plugin_admin_page'),
