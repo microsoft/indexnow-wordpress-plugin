@@ -22,7 +22,7 @@
  * @link       https://www.bing.com/webmaster
  * @since      1.0.0
  *
- * @package    Bing_Webmaster
+ * @package    BWT_IndexNow
  */
 
 // If uninstall not called from WordPress, then exit.
