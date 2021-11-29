@@ -3,11 +3,11 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * @package    Bing_Webmaster
- * @subpackage Bing_Webmaster/admin
+ * @package    BWT_IndexNow
+ * @subpackage BWT_IndexNow/admin
  * @author     Index Now <bingwpus@microsoft.com>
  */
-class Bing_Webmaster_Admin {
+class BWT_IndexNow_Admin {
 
 	/**
 	 * The ID of this plugin.
@@ -27,7 +27,7 @@ class Bing_Webmaster_Admin {
 	 */
 	private $version;
 
-	private $prefix = "bwt-";
+	private $prefix = "bwt-indexnow-";
 
 	private $routes;
 	
@@ -40,11 +40,11 @@ class Bing_Webmaster_Admin {
 	 */
 	public function __construct( $plugin_name, $version ) {
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/utils/class-bing-url-submission-admin-utils.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/utils/class-bing-url-submission-admin-routes.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/utils/class-indexnow-url-submission-admin-utils.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/utils/class-indexnow-url-submission-admin-routes.php';
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->routes = new Bing_Webmaster_Admin_Routes($this->plugin_name, $this->version, $this->prefix);
+		$this->routes = new BWT_IndexNow_Admin_Routes($this->plugin_name, $this->version, $this->prefix);
 
 	}
 
@@ -70,7 +70,7 @@ class Bing_Webmaster_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bing-url-submission-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/indexnow-url-submission-admin.js', array( 'jquery' ), $this->version, false );
 
 		$JSfiles = scandir(dirname(__FILE__) . '/../static/js/');
 		   $react_js_to_load = '';
@@ -105,7 +105,7 @@ class Bing_Webmaster_Admin {
 		 * Add a menu page for this plugin.
 		 */
 		add_menu_page(
-			__('Index Now Tools Url Submission', $this->plugin_name),
+			__('Index Now Url Submission', $this->plugin_name),
 			__('Index Now', $this->plugin_name),
 			'manage_options',
 			$this->plugin_name,
@@ -121,7 +121,7 @@ class Bing_Webmaster_Admin {
 	 */
 	public function display_plugin_admin_page()
 	{
-		include_once('partials/bing-url-submission-admin-react.php');
+		include_once('partials/indexnow-url-submission-admin-react.php');
 	}
 
 	/**
@@ -197,7 +197,7 @@ class Bing_Webmaster_Admin {
 				$siteUrl = get_home_url();
 
 				// check if same url was submitted recently(within a minute)
-				if ($new_status != 'trash' && Bing_Webmaster_Admin_Utils::url_submitted_within_last_minute(Bing_Webmaster_Admin_Routes::$passed_submissions_table, $link)) {
+				if ($new_status != 'trash' && BWT_IndexNow_Admin_Utils::url_submitted_within_last_minute(BWT_IndexNow_Admin_Routes::$passed_submissions_table, $link)) {
 					return;
 				}
 				$api_key = base64_decode($admin_api_key);

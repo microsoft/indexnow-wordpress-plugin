@@ -4,16 +4,16 @@
  * The admin-specific functionality of the plugin.
  * Utilities used by the plugin
  *
- * @package    Bing_Webmaster
- * @subpackage Bing_Webmaster/admin-utils
+ * @package    BWT_IndexNow
+ * @subpackage BWT_IndexNow/admin-utils
  * @author     Bing Webmaster <bingwpus@microsoft.com>
  */
-class Bing_Webmaster_Admin_Utils {
+class BWT_IndexNow_Admin_Utils {
 
 	/**
 	 * This function finds out the ocunt of submissions in last 48 hours.
 	 */
-	public static function get_count( SubmissionCount $submission_count ) {
+	public static function get_count( IndexNowSubmissionCount $submission_count ) {
 		$curr_time = time();
 		self::set_last_date( $submission_count, $curr_time );
 		$count = 0;
@@ -26,7 +26,7 @@ class Bing_Webmaster_Admin_Utils {
 	/**
 	 * Increase the count by 1.
 	 */
-	public static function increase_count( SubmissionCount $submission_count ) {
+	public static function increase_count( IndexNowSubmissionCount $submission_count ) {
 		$curr_time = time();
 		self::set_last_date( $submission_count, $curr_time );
 		$submission_count->hourly_count[ $submission_count->index ]++;
@@ -36,7 +36,7 @@ class Bing_Webmaster_Admin_Utils {
 	 * Set the last date when count was accessed/increased.
 	 * We store the count in array of size 48, count per hour so that we don't need to store every submission.
 	 */
-	private static function set_last_date( SubmissionCount $submission_count, $curr_time ) {
+	private static function set_last_date( IndexNowSubmissionCount $submission_count, $curr_time ) {
 		$curr_hour = (int) ( $curr_time / 3600 );
 		$last_hour = (int) ( $submission_count->last_count_date / 3600 );
 		if ( $curr_hour - $last_hour <= 48 ) {
@@ -82,7 +82,7 @@ class Bing_Webmaster_Admin_Utils {
 		return is_array( $results ) && count( $results ) > 0;
 	}
 
-	public static function insert_submission( $table, Submissions $submission ) {
+	public static function insert_submission( $table, IndexNowSubmissions $submission ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . $table;
 		$results = $wpdb->insert(
@@ -115,13 +115,13 @@ class Bing_Webmaster_Admin_Utils {
 		$api_key = wp_generate_uuid4();
 		$api_key = preg_replace('[-]', '', $api_key);
 		error_log($api_key);
-		update_option( 'bwt-is_valid_api_key', '2' );
-		update_option( 'bwt-admin_api_key', base64_encode( $api_key ) );
-		update_option( 'bwt-is_valid_api_key', '1' );
+		update_option( 'bwt-indexnow-is_valid_api_key', '2' );
+		update_option( 'bwt-indexnow-admin_api_key', base64_encode( $api_key ) );
+		update_option( 'bwt-indexnow-is_valid_api_key', '1' );
 	}
 }
 
-class SubmissionCount {
+class IndexNowSubmissionCount {
 
 	public function __construct() {
 

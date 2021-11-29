@@ -9,11 +9,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Bing_Webmaster
- * @subpackage Bing_Webmaster/includes
+ * @package    BWT_IndexNow
+ * @subpackage BWT_IndexNow/includes
  * @author     Bing Webmaster <bingwpus@microsoft.com>
  */
-class Bing_Webmaster {
+class BWT_IndexNow {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -21,7 +21,7 @@ class Bing_Webmaster {
 	 *
 	 * @since    0.01.01
 	 * @access   protected
-	 * @var      Bing_Webmaster_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      BWT_IndexNow_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -71,8 +71,8 @@ class Bing_Webmaster {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Bing_Webmaster_Loader. Orchestrates the hooks of the plugin.
-	 * - Bing_Webmaster_Admin. Defines all hooks for the admin area.
+	 * - BWT_IndexNow_Loader. Orchestrates the hooks of the plugin.
+	 * - BWT_IndexNow_Admin. Defines all hooks for the admin area.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -86,14 +86,14 @@ class Bing_Webmaster {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bing-url-submission-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-indexnow-url-submission-loader.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-bing-url-submission-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-indexnow-url-submission-admin.php';
 
-		$this->loader = new Bing_Webmaster_Loader();
+		$this->loader = new BWT_IndexNow_Loader();
 
 	}
 
@@ -106,7 +106,7 @@ class Bing_Webmaster {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Bing_Webmaster_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new BWT_IndexNow_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -151,7 +151,7 @@ class Bing_Webmaster {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Bing_Webmaster_Loader    Orchestrates the hooks of the plugin.
+	 * @return    BWT_IndexNow_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

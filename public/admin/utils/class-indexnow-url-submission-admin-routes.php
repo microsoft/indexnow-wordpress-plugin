@@ -4,11 +4,11 @@
  * The admin-specific functionality of the plugin.
  * This class contains the routes needed by the UI
  *
- * @package    Bing_Webmaster
- * @subpackage Bing_Webmaster/admin-routes
+ * @package    BWT_IndexNow
+ * @subpackage BWT_IndexNow/admin-routes
  * @author     Bing Webmaster <bingwpus@microsoft.com>
  */
-class Bing_Webmaster_Admin_Routes {
+class BWT_IndexNow_Admin_Routes {
 
     /**
 	 * The ID of this plugin.
@@ -28,11 +28,11 @@ class Bing_Webmaster_Admin_Routes {
 	 */
 	private $version;
 
-	private $prefix = "bwt-";
+	private $prefix = "bwt-indexnow-";
 
-	public static $passed_submissions_table = "bwt_passed_submissions";
+	public static $passed_submissions_table = "bwt_indexnow_passed_submissions";
 
-	public static $failed_submissions_table = "bwt_failed_submissions";
+	public static $failed_submissions_table = "bwt_indexnow_failed_submissions";
 
 	/**
 	 * Initialize the class and set its properties.
@@ -188,31 +188,6 @@ class Bing_Webmaster_Admin_Routes {
 		return $this->try_catch(array($request, array($this, 'call_delete_submissions')), array($this, 'validate_api_key'));
 	}
 
-	// private function get_site_quota($api_key, $siteUrl)
-	// {
-	// 	$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/GetUrlSubmissionQuota?apikey=" . $api_key . "&siteUrl=" . $siteUrl . "&client=wp_v_" . $this->version );
-
-	// 	if (is_wp_error( $response )) {
-	// 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-	// 			error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
-	// 		}
-	// 		return -1;
-	// 	}
-	// 	if (isset($response['errors'])) {
-	// 		return -1;
-	// 	}
-	// 	try {
-	// 		if ($response['response']['code'] === 200) {
-	// 			$message = json_decode($response['body'])->{'d'}->{'DailyQuota'};
-	// 			return $message;
-	// 		} else {
-	// 			return -1;
-	// 		}
-	// 	} catch (\Throwable $th) {
-	// 		return -1;
-	// 	}
-	// }
-
 	private function check_bwt_api_key( $api_key ) {
 		$siteUrl = get_home_url();
 		$data = "{\n\t\"siteUrl\":\"".$siteUrl."\"}";
@@ -257,14 +232,14 @@ class Bing_Webmaster_Admin_Routes {
 
 		$fail_count = null;
 		if (is_bool($failed_count)) {
-			$fail_count = new SubmissionCount();
+			$fail_count = new IndexNowSubmissionCount();
 		}
 		else {
 			$fail_count = $failed_count;
 		}
 		$pass_count = null;
 		if (is_bool($passed_count)) {
-			$pass_count = new SubmissionCount();
+			$pass_count = new IndexNowSubmissionCount();
 		}
 		else {
 			$pass_count = $passed_count;
@@ -274,26 +249,26 @@ class Bing_Webmaster_Admin_Routes {
 			$output = $this->submit_url_to_bwt($siteUrl, $submission->url, $api_key, $submission->type, true);
 			if (substr($output, 0, 6) == 'error:') {
 				$error = $this->get_api_error(substr($output, 6));
-				$response = new SubmissionResponse($submission->url, false, $error);
-				Bing_Webmaster_Admin_Utils::insert_submission(Bing_Webmaster_Admin_Routes::$failed_submissions_table, new Submissions($submission->url, time(), 0, $submission->type, $error));
+				$response = new IndexNowSubmissionResponse($submission->url, false, $error);
+				BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$failed_submissions_table, new IndexNowSubmissions($submission->url, time(), 0, $submission->type, $error));
 				array_push($responses, $response);
-				Bing_Webmaster_Admin_Utils::increase_count($fail_count);
+				BWT_IndexNow_Admin_Utils::increase_count($fail_count);
 				update_option( $this->prefix . 'failed_count', $fail_count );
 				return false;
 			} else {
-				$response = new SubmissionResponse($submission->url, true, WPErrors::Success);
+				$response = new IndexNowSubmissionResponse($submission->url, true, WP_IN_Errors::Success);
 				array_push($responses, $response);
-				Bing_Webmaster_Admin_Utils::insert_submission(Bing_Webmaster_Admin_Routes::$passed_submissions_table, new Submissions($submission->url, time(), 1, $submission->type, WPErrors::Success));
-				Bing_Webmaster_Admin_Utils::increase_count($pass_count);
+				BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$passed_submissions_table, new IndexNowSubmissions($submission->url, time(), 1, $submission->type, WP_IN_Errors::Success));
+				BWT_IndexNow_Admin_Utils::increase_count($pass_count);
 				update_option( $this->prefix . 'passed_count', $passed_count );
 				return true;
 			}
 		}
 		else {
-			$response = new SubmissionResponse($submission->url, false, WPErrors::InvalidApiKey);
-			Bing_Webmaster_Admin_Utils::insert_submission(Bing_Webmaster_Admin_Routes::$failed_submissions_table, new Submissions($submission->url, time(), 0, $submission->type), WPErrors::InvalidApiKey);
+			$response = new IndexNowSubmissionResponse($submission->url, false, WP_IN_Errors::InvalidApiKey);
+			BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$failed_submissions_table, new IndexNowSubmissions($submission->url, time(), 0, $submission->type), WP_IN_Errors::InvalidApiKey);
 			array_push($responses, $response);
-			Bing_Webmaster_Admin_Utils::increase_count($fail_count);
+			BWT_IndexNow_Admin_Utils::increase_count($fail_count);
 			update_option( $this->prefix . 'failed_count', $fail_count );
 			return false;
 		}
@@ -367,16 +342,16 @@ class Bing_Webmaster_Admin_Routes {
 		if (substr($output, 0, 6) == 'error:') {
 			$error_msg = substr($output, 6);
 			$error_type = $this->get_api_error($error_msg);
-			$failedUrl = new Submissions($url, time(), 0, "add", $error_type);
-			Bing_Webmaster_Admin_Utils::insert_submission(Bing_Webmaster_Admin_Routes::$failed_submissions_table, $failedUrl);
+			$failedUrl = new IndexNowSubmissions($url, time(), 0, "add", $error_type);
+			BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$failed_submissions_table, $failedUrl);
 			$fail_count = null;
 			if (is_bool($failed_count)) {
-				$fail_count = new SubmissionCount();
+				$fail_count = new IndexNowSubmissionCount();
 			}
 			else {
 				$fail_count = $failed_count;
 			}
-			Bing_Webmaster_Admin_Utils::increase_count($fail_count);
+			BWT_IndexNow_Admin_Utils::increase_count($fail_count);
 			// get the lastest options to avoid inconsistency
 			update_option( $this->prefix . 'failed_count', $fail_count );
 
@@ -384,21 +359,21 @@ class Bing_Webmaster_Admin_Routes {
 				'error' => $error_type
 				), 200 );
 		} else {
-			$passedUrl = new Submissions($url, time(), 1, "add", WPErrors::Success);
-			Bing_Webmaster_Admin_Utils::insert_submission(Bing_Webmaster_Admin_Routes::$passed_submissions_table, $passedUrl);
+			$passedUrl = new IndexNowSubmissions($url, time(), 1, "add", WP_IN_Errors::Success);
+			BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$passed_submissions_table, $passedUrl);
 			$pass_count = null;
 			if (is_bool($passed_count)) {
-				$pass_count = new SubmissionCount();
+				$pass_count = new IndexNowSubmissionCount();
 			}
 			else {
 				$pass_count = $passed_count;
 			}
-			Bing_Webmaster_Admin_Utils::increase_count($pass_count);
+			BWT_IndexNow_Admin_Utils::increase_count($pass_count);
 			// get the lastest options to avoid inconsistency
 			update_option( $this->prefix . 'passed_count', $pass_count );
 
 			return new \WP_REST_Response( array(
-				'error' => WPErrors::NoError
+				'error' => WP_IN_Errors::NoError
 				), 200 );
 		}
 	}
@@ -410,15 +385,15 @@ class Bing_Webmaster_Admin_Routes {
 		catch (\Throwable $th) {
 			return new \WP_REST_Response( array(
 				'hasAPIKey' => false,
-				'error' => WPErrors::InvalidRequest,
-				'error_type' => WPErrors::InvalidRequest
+				'error' => WP_IN_Errors::InvalidRequest,
+				'error_type' => WP_IN_Errors::InvalidRequest
 			), 500 );
 		}
 		catch (\Exception $e) {
 			return new \WP_REST_Response( array(
 				'hasAPIKey' => false,
-				'error' => WPErrors::InvalidRequest,
-				'error_type' => WPErrors::InvalidRequest
+				'error' => WP_IN_Errors::InvalidRequest,
+				'error_type' => WP_IN_Errors::InvalidRequest
 			), 500 );
 		}
 	}
@@ -430,13 +405,13 @@ class Bing_Webmaster_Admin_Routes {
 		}
 		if (!$admin_api_key) {
 			return new \WP_REST_Response( array(
-				'error_type' => WPErrors::ErrorInWpOptions,
-				'error' => WPErrors::ErrorInWpOptions
+				'error_type' => WP_IN_Errors::ErrorInWpOptions,
+				'error' => WP_IN_Errors::ErrorInWpOptions
 				), 400 );
 		}
 		return new \WP_REST_Response( array(
-			'error_type' => WPErrors::ApiKeyNotFound,
-			'error' => WPErrors::ApiKeyNotFound
+			'error_type' => WP_IN_Errors::ApiKeyNotFound,
+			'error' => WP_IN_Errors::ApiKeyNotFound
 			), 400 );
 	}
 
@@ -471,13 +446,13 @@ class Bing_Webmaster_Admin_Routes {
 					update_option($this->prefix . 'is_valid_api_key', "1");
 					update_option($this->prefix . 'auto_submission_enabled', "1");
 					return new \WP_REST_Response( array(
-						'error_type' => WPErrors::NoError
+						'error_type' => WP_IN_Errors::NoError
 						), 200 );
 					
 				}
 				else {
 					return new \WP_REST_Response( array(
-						'error_type' => WPErrors::InvalidApiKeyFormat
+						'error_type' => WP_IN_Errors::InvalidApiKeyFormat
 					), 200 );
 				}
 			}
@@ -489,13 +464,13 @@ class Bing_Webmaster_Admin_Routes {
 				update_option($this->prefix . 'is_valid_api_key', "2");
 				update_option($this->prefix . 'auto_submission_enabled', "1");
 				return new \WP_REST_Response( array(
-					'error_type' => WPErrors::NoError
+					'error_type' => WP_IN_Errors::NoError
 					), 200 );
 			}
 		}
 
 		return new \WP_REST_Response( array(
-			'error_type' => WPErrors::InvalidRequest
+			'error_type' => WP_IN_Errors::InvalidRequest
 		), 200 );
 	}
 
@@ -510,7 +485,7 @@ class Bing_Webmaster_Admin_Routes {
 				update_option( $this->prefix . 'is_valid_api_key', true );
 			}
 			return new \WP_REST_Response( array(
-				'error_type' => WPErrors::NoError
+				'error_type' => WP_IN_Errors::NoError
 				), 200 );
 		}
 		else {
@@ -534,7 +509,7 @@ class Bing_Webmaster_Admin_Routes {
 		return new \WP_REST_Response( array(
 			'AutoSubmissionEnabled' => $auto_submission_enabled === "1",
 			'SiteUrl' => $siteUrl,
-			'error_type' => WPErrors::NoError
+			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
 
@@ -545,13 +520,13 @@ class Bing_Webmaster_Admin_Routes {
 			if (isset($json->AutoSubmissionEnabled)) {
 				update_option( $this->prefix . 'auto_submission_enabled', $json->AutoSubmissionEnabled ? "1" : "2" );
 				return new \WP_REST_Response( array(
-					'error_type' => WPErrors::NoError
+					'error_type' => WP_IN_Errors::NoError
 					), 200 );
 			}
 		}
 
 		return new \WP_REST_Response( array(
-			'error_type' => WPErrors::InvalidRequest
+			'error_type' => WP_IN_Errors::InvalidRequest
 		), 200 );
 	}
 
@@ -565,7 +540,7 @@ class Bing_Webmaster_Admin_Routes {
 				$url = sanitize_text_field($json->url);
 				if (empty($url) || !preg_match('/^(https?:\/\/([-\w\.]+)+(:\d+)?(\/([-\w\/_\.]*(\?\S+)?)?)?)$/i', $url, $matches)) {
 					return new \WP_REST_Response( array(
-						'error' => WPErrors::InvalidInputUrl
+						'error' => WP_IN_Errors::InvalidInputUrl
 						), 200 );
 				} else {
 					if ($is_valid_api_key && $is_valid_api_key === "1") {
@@ -575,12 +550,12 @@ class Bing_Webmaster_Admin_Routes {
 						return $this->update_submission_output($output, $url);
 					}
 					return new \WP_REST_Response( array(
-						'error' => WPErrors::InvalidApiKey
+						'error' => WP_IN_Errors::InvalidApiKey
 						), 200 );
 				}
 			}
 			return new \WP_REST_Response( array(
-				'error' => WPErrors::EmptyUrl
+				'error' => WP_IN_Errors::EmptyUrl
 				), 200 );
 		}
 	}
@@ -591,14 +566,14 @@ class Bing_Webmaster_Admin_Routes {
 		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
 		// check if we have failed submissions
 		if (is_bool($failed_count)) {
-			$failed_count = new SubmissionCount();
+			$failed_count = new IndexNowSubmissionCount();
 		}
 		// check if we have passed submissions
 		if (is_bool($passed_count)) {
-			$passed_count = new SubmissionCount();
+			$passed_count = new IndexNowSubmissionCount();
 		}
-		$pass_count = Bing_Webmaster_Admin_Utils::get_count($passed_count);
-		$fail_count = Bing_Webmaster_Admin_Utils::get_count($failed_count);
+		$pass_count = BWT_IndexNow_Admin_Utils::get_count($passed_count);
+		$fail_count = BWT_IndexNow_Admin_Utils::get_count($failed_count);
 		// save the options, incase they got updated
 		update_option( $this->prefix . 'failed_count', $failed_count );
 		update_option( $this->prefix . 'passed_count', $passed_count );
@@ -611,13 +586,13 @@ class Bing_Webmaster_Admin_Routes {
 			'FailedSubmissionCount' => $fail_count,
 			'PassedSubmissionCount' => $pass_count,
 			// 'Quota' => $quota,
-			'error_type' => WPErrors::NoError
+			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
 
 	private function call_get_submissions( $request, $admin_api_key ) {
-		$passed_submissions = Bing_Webmaster_Admin_Utils::get_submissions(Bing_Webmaster_Admin_Routes::$passed_submissions_table);
-		$failed_submissions = Bing_Webmaster_Admin_Utils::get_submissions(Bing_Webmaster_Admin_Routes::$failed_submissions_table);
+		$passed_submissions = BWT_IndexNow_Admin_Utils::get_submissions(BWT_IndexNow_Admin_Routes::$passed_submissions_table);
+		$failed_submissions = BWT_IndexNow_Admin_Utils::get_submissions(BWT_IndexNow_Admin_Routes::$failed_submissions_table);
 		$submissions = array_merge($failed_submissions, $passed_submissions);
 		usort($submissions, function ($a, $b) {
 			return $a->submission_date > $b->submission_date;
@@ -625,7 +600,7 @@ class Bing_Webmaster_Admin_Routes {
 
 		return new \WP_REST_Response( array(
 			'Submissions' => $submissions,
-			'error_type' => WPErrors::NoError
+			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
 
@@ -646,73 +621,73 @@ class Bing_Webmaster_Admin_Routes {
 				}
 				if (count($responses) == 0) {
 					return new \WP_REST_Response( array(
-						'error_type' => WPErrors::InvalidOrNoUrls
+						'error_type' => WP_IN_Errors::InvalidOrNoUrls
 						), 400 );
 				}
 				return new \WP_REST_Response( array(
 					'hasError' => $has_error,
 					'SubmissionErrors' => $responses,
-					'error_type' => WPErrors::NoError
+					'error_type' => WP_IN_Errors::NoError
 					), 200 );
 			}
 			return new \WP_REST_Response( array(
-				'error_type' => WPErrors::InvalidOrNoUrls
+				'error_type' => WP_IN_Errors::InvalidOrNoUrls
 				), 400 );
 		}
 	}
 
 	private function call_delete_submissions( $request, $admin_api_key ) {
-		Bing_Webmaster_Admin_Utils::delete_submissions(Bing_Webmaster_Admin_Routes::$failed_submissions_table);
-		Bing_Webmaster_Admin_Utils::delete_submissions(Bing_Webmaster_Admin_Routes::$passed_submissions_table);
+		BWT_IndexNow_Admin_Utils::delete_submissions(BWT_IndexNow_Admin_Routes::$failed_submissions_table);
+		BWT_IndexNow_Admin_Utils::delete_submissions(BWT_IndexNow_Admin_Routes::$passed_submissions_table);
 
 		return new \WP_REST_Response( array(
 			'FailedSubmissions' => array(),
 			'PassedSubmissions' => array(),
-			'error_type' => WPErrors::NoError
+			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
 
 	private function get_api_error($message, $isSite = false) {
 		switch ($message) {
-			case 'RequestFailed' : return WPErrors::WP_RequestFailed;
-			case 'NotVerified' : return WPErrors::NotVerified;
-			case 'Not Found' : return WPErrors::BWT_InvalidApiCall;
+			case 'RequestFailed' : return WP_IN_Errors::WP_RequestFailed;
+			case 'NotVerified' : return WP_IN_Errors::NotVerified;
+			case 'Not Found' : return WP_IN_Errors::BWT_InvalidApiCall;
 			default : break;
 		}
 		if (strlen($message) < 9) {
-			return WPErrors::OtherError;
+			return WP_IN_Errors::OtherError;
 		}
 		$error = substr($message, 9);
 		switch ($error) {
-			case 'InternalError' : return WPErrors::BWT_InternalError;
-			case 'UnknownError' : return WPErrors::BWT_UnknownError;
-			case 'InvalidApiKey' : return WPErrors::BWT_InvalidApiKey;
-			case 'ThrottleUser' : return WPErrors::BWT_ThrottleUser;
-			case 'ThrottleHost' : return WPErrors::BWT_ThrottleHost;
-			case 'UserBlocked' : return WPErrors::BWT_UserBlocked;
-			case 'InvalidUrl' : return WPErrors::BWT_InvalidUrl;
-			case 'InvalidParameter' : return WPErrors::BWT_InvalidParameter;
-			case 'UserNotFound' : return WPErrors::BWT_UserNotFound;
-			case 'NotFound' : return WPErrors::BWT_NotFound;
-			case 'NotAllowed' : return WPErrors::BWT_NotAllowed;
-			case 'NotAuthorized' : return WPErrors::BWT_NotAuthorized;
-			case 'ThrottleIP' : return WPErrors::BWT_ThrottleIP;
-			case 'InvalidToken' : return WPErrors::BWT_InvalidToken;
-			case 'SiteUriSchemeIsNotSupported' : return WPErrors::BWT_SiteUriSchemeIsNotSupported;
-			case 'AuthorizationFailed' : return $isSite ? WPErrors::BWT_AuthorizationFailed_Site : WPErrors::BWT_AuthorizationFailed_Url;
+			case 'InternalError' : return WP_IN_Errors::BWT_InternalError;
+			case 'UnknownError' : return WP_IN_Errors::BWT_UnknownError;
+			case 'InvalidApiKey' : return WP_IN_Errors::BWT_InvalidApiKey;
+			case 'ThrottleUser' : return WP_IN_Errors::BWT_ThrottleUser;
+			case 'ThrottleHost' : return WP_IN_Errors::BWT_ThrottleHost;
+			case 'UserBlocked' : return WP_IN_Errors::BWT_UserBlocked;
+			case 'InvalidUrl' : return WP_IN_Errors::BWT_InvalidUrl;
+			case 'InvalidParameter' : return WP_IN_Errors::BWT_InvalidParameter;
+			case 'UserNotFound' : return WP_IN_Errors::BWT_UserNotFound;
+			case 'NotFound' : return WP_IN_Errors::BWT_NotFound;
+			case 'NotAllowed' : return WP_IN_Errors::BWT_NotAllowed;
+			case 'NotAuthorized' : return WP_IN_Errors::BWT_NotAuthorized;
+			case 'ThrottleIP' : return WP_IN_Errors::BWT_ThrottleIP;
+			case 'InvalidToken' : return WP_IN_Errors::BWT_InvalidToken;
+			case 'SiteUriSchemeIsNotSupported' : return WP_IN_Errors::BWT_SiteUriSchemeIsNotSupported;
+			case 'AuthorizationFailed' : return $isSite ? WP_IN_Errors::BWT_AuthorizationFailed_Site : WP_IN_Errors::BWT_AuthorizationFailed_Url;
 			default : return $this->get_custom_api_error($error);
 		}
 	}
 
 	private function get_custom_api_error($error) {
 		if (stripos($error, "Invalid Urls") !== false) {
-			return WPErrors::BWT_InvalidUrl;
+			return WP_IN_Errors::BWT_InvalidUrl;
 		}
 		else if (stripos($error, "null") !== false) {
-			return WPErrors::BWT_NullException;
+			return WP_IN_Errors::BWT_NullException;
 		}
 		else if (stripos($error, "exceeded") !== false) {
-			return WPErrors::BWT_QuotaFull;
+			return WP_IN_Errors::BWT_QuotaFull;
 		}
 		else {
 			return $error;
@@ -720,8 +695,8 @@ class Bing_Webmaster_Admin_Routes {
 	}
 }
 
-class Submissions {
-	public function __construct($url, $submission_date, $submission_type, $type, $error = WPErrors::Success) {
+class IndexNowSubmissions {
+	public function __construct($url, $submission_date, $submission_type, $type, $error = WP_IN_Errors::Success) {
 		$this->url = $url;
 		$this->submission_type = $submission_type;
 		$this->submission_date = $submission_date;
@@ -736,7 +711,7 @@ class Submissions {
 	public $type;
 }
 
-class SubmissionResponse {
+class IndexNowSubmissionResponse {
 	public function __construct($url, $isSubmitted, $error_msg = "") {
 		$this->url = $url;
 		$this->isSubmitted = $isSubmitted;
@@ -748,7 +723,7 @@ class SubmissionResponse {
 }
 
 // The list of potential erorr. All may not be used.
-class WPErrors {
+class WP_IN_Errors {
 	const __default = self::Success;
 
 	const NoError = "";

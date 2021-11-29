@@ -7,11 +7,11 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Bing_Webmaster
- * @subpackage Bing_Webmaster/includes
+ * @package    BWT_IndexNow
+ * @subpackage BWT_IndexNow/includes
  * @author     Bing Webmaster <bingwpus@microsoft.com>
  */
-class Bing_Webmaster_Loader {
+class BWT_IndexNow_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
