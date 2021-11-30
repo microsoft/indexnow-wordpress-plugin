@@ -1,6 +1,6 @@
 @import "default";
 
-.bw-App {
+.indexnow-App {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -8,7 +8,7 @@
   flex-flow: row wrap;
   justify-content: center;
 
-  .bw-Banner {
+  .indexnow-Banner {
     margin: 12px 0;
     // width: 100%;
     padding: 8px 24px;
@@ -26,15 +26,15 @@
     }
   }
 
-  .bw-BannerHidden {
+  .indexnow-BannerHidden {
     display: none;
   }
 
-  .bw-BannerSuccess {
+  .indexnow-BannerSuccess {
     background-color: #caeaca;
   }
 
-  .bw-BannerFailure {
+  .indexnow-BannerFailure {
     background-color: #f6cfcf;
   }
   .maskSpinner {
@@ -48,6 +48,6 @@
   }
 }
 
-.bw-MainContainer {
+.indexnow-MainContainer {
   width: $bwt_pageContentWidth;
 }

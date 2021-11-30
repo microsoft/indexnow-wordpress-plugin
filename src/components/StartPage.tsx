@@ -37,7 +37,7 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
   }, []);
 
   return (
-    <div className="bw-StartPageContent">
+    <div className="indexnow-StartPageContent">
       <div className="featuresSection">
         <h2 className="inlineText">What you can do with this plugin</h2>
 

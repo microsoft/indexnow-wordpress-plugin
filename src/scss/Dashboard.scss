@@ -1,6 +1,6 @@
 @import "./default";
 
-.bw-DashboardContent {
+.indexnow-DashboardContent {
   margin-top: 25px;
 
   .sectionTitle {
@@ -23,31 +23,31 @@
     }
   }
 
-  .bw-CardRow {
+  .indexnow-CardRow {
     margin: 8px 0;
     font-size: 16px;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
 
-    .bw-CardColumn-1 {
+    .indexnow-CardColumn-1 {
       width: 100%;
       min-width: 320px;
     }
 
-    .bw-CardColumn-2 {
+    .indexnow-CardColumn-2 {
       width: calc((100% - 8px) / 2);
       min-width: 320px;
     }
 
-    .bw-CardColumn {
+    .indexnow-CardColumn {
       background-color: $bwt_white;
       position: relative;
       box-shadow: 0px 0.6px 2px #0000001c;
       border-radius: 12px;
       display: flex;
 
-      .bw-PopOverMenu {
+      .indexnow-PopOverMenu {
         width: 10%;
         height: 100%;
         display: flex;
@@ -86,11 +86,11 @@
         }
       }
 
-      .bw-Card-WithPopOver {
+      .indexnow-Card-WithPopOver {
         width: 90%;
       }
 
-      .bw-Disabled {
+      .indexnow-Disabled {
         filter: opacity(0.4);
         &:hover {
           background-color: inherit;
@@ -98,7 +98,7 @@
         }
       }
 
-      .bw-Card {
+      .indexnow-Card {
         padding: 18px 24px;
         width: 100%;
 
@@ -106,7 +106,7 @@
           font-size: 18px;
           color: $bwt_cardTextColor;
 
-          .bw-CardTitleIcon {
+          .indexnow-CardTitleIcon {
             margin-right: 4px;
           }
 
@@ -130,7 +130,7 @@
       }
     }
 
-    .bw-OverviewSection {
+    .indexnow-OverviewSection {
       display: flex;
       justify-content: space-between;
       width: 100%;
@@ -155,14 +155,14 @@
       }
     }
 
-    .bw-ApiKeyCard {
+    .indexnow-ApiKeyCard {
       .cardDescription {
         color: $bwt_cardTextColor;
       }
     }
 
-    .bw-ManualURLSubmissionCard {
-      .bw-Card {
+    .indexnow-ManualURLSubmissionCard {
+      .indexnow-Card {
         .cardContent {
           display: flex;
           justify-content: space-between;
@@ -170,7 +170,7 @@
       }
     }
 
-    .bw-UrlSubmissions {
+    .indexnow-UrlSubmissions {
       padding: 0;
 
       > * {
@@ -203,7 +203,7 @@
   }
 }
 
-.bw-Modal {
+.indexnow-Modal {
   display: none;
   position: fixed;
   width: 40%;
@@ -263,7 +263,7 @@
       }
 
       button.primaryButton {
-        background-color: #0075D4;
+        background-color: #990000;
         color: $bwt_white;
       }
 

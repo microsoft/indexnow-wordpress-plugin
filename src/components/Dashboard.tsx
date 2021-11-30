@@ -188,7 +188,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           <Icon
             iconName="Sync"
             data-submission={JSON.stringify(item)}
-            className="bw-Icon retryIcon"
+            className="indexnow-Icon retryIcon"
             onClick={resubmitOnClick}
           />
         );
@@ -311,24 +311,24 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     <>
       <div
         className={
-          "bw-DashboardContent" +
+          "indexnow-DashboardContent" +
           (modalState !== DashboardModalState.Hidden ? " darken" : "")
         }
       >
-        <div className="bw-CardRow">
-          {/* <div className="bw-CardColumn bw-CardColumn-2 bw-ApiKeyCard"> */}
+        <div className="indexnow-CardRow">
+          {/* <div className="indexnow-CardColumn indexnow-CardColumn-2 indexnow-ApiKeyCard"> */}
             {/* <Card
               title="API Key"
               tooltip="API Key is a unique identifier that is used to authenticate API requests."
               leadingIconName="Permissions"
-              className="bw-Card-WithPopOver"
+              className="indexnow-Card-WithPopOver"
             >
               <p className="cardDescription">
                 ********************************
               </p>
             </Card>
             <div
-              className="bw-PopOverMenu"
+              className="indexnow-PopOverMenu"
               onMouseEnter={() => {
                 setShowApiKeyPopOverMenu(true);
               }}
@@ -356,12 +356,12 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                 </ul>
               </div>
             </div> */}
-             <div className="bw-CardColumn bw-CardColumn-2">
+             <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Manual URL submission"
               tooltip="This feature allows you to submit a URL directly into the Bing index."
               leadingIconName="Send"
-              className={apiKeyInvalid ? "bw-Disabled" : ""}
+              className={apiKeyInvalid ? "indexnow-Disabled" : ""}
             >
               <p className="cardDescription">
                 This feature allows you to submit a URL directly into the Bing
@@ -381,11 +381,11 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             </Card>
           </div>
 
-          <div className="bw-CardColumn bw-CardColumn-2">
+          <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Automate URL submission"
               className={
-                "bw-Card-WithPopOver " + (apiKeyInvalid ? "bw-Disabled" : "")
+                "indexnow-Card-WithPopOver " + (apiKeyInvalid ? "indexnow-Disabled" : "")
               }
               tooltip="This feature allows to configure automation to submit new, updated & deleted URLs to Bing and stay updated."
               leadingIconName="Rocket"
@@ -400,7 +400,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             </Card>
             <div
               className={
-                "bw-PopOverMenu " + (apiKeyInvalid ? "bw-Disabled" : "")
+                "indexnow-PopOverMenu " + (apiKeyInvalid ? "indexnow-Disabled" : "")
               }
               onMouseEnter={() => {
                 // don't show popover menu if API key is invalid
@@ -439,13 +439,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         </div>
 
-        <div className="bw-CardRow">
-          {/* <div className="bw-CardColumn bw-CardColumn-1 bw-ManualURLSubmissionCard">
+        <div className="indexnow-CardRow">
+          {/* <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-ManualURLSubmissionCard">
             <Card
               title="Manual URL submission"
               tooltip="This feature allows you to submit a URL directly into the Bing index."
               leadingIconName="Send"
-              className={apiKeyInvalid ? "bw-Disabled" : ""}
+              className={apiKeyInvalid ? "indexnow-Disabled" : ""}
             >
               <p className="cardDescription">
                 This feature allows you to submit a URL directly into the Bing
@@ -466,8 +466,8 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         </div>
 
         {/* <h2 className="sectionTitle">Overview</h2> */}
-        <div className="bw-CardRow">
-          <div className="bw-OverviewSection">
+        <div className="indexnow-CardRow">
+          <div className="indexnow-OverviewSection">
             {/* <div className="infoCards">
               <h4>Quota left for the day</h4>
               <h2>
@@ -477,7 +477,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               </h2>
               <p>(Resets at 00:00 GMT)</p>
             </div> */}
-            <div className="bw-CardColumn bw-CardColumn-2">
+            <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Successful submissions"
               leadingIconName={"Bullseye"}
@@ -494,7 +494,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               </p>
             </Card>
             </div>
-            <div className="bw-CardColumn bw-CardColumn-2">
+            <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Failed submissions"
               leadingIconName={"StatusErrorFull"}
@@ -526,8 +526,8 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             text="Download"
           />
         </div>
-        <div className="bw-CardRow">
-          <div className="bw-CardColumn bw-CardColumn-1 bw-UrlSubmissions">
+        <div className="indexnow-CardRow">
+          <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-UrlSubmissions">
             <ShimmeredDetailsList
               setKey="items"
               items={submissionsList?.Submissions ?? []}
@@ -563,17 +563,17 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
       </div>
       <div
         className={
-          "bw-Modal" +
+          "indexnow-Modal" +
           (modalState !== DashboardModalState.Hidden ? " showModal" : "")
         }
       >
         {modalState === DashboardModalState.UpdateApiKeyModal && (
-          <div className={"modalContainer bw-ModalUpdateApiKey"}>
+          <div className={"modalContainer indexnow-ModalUpdateApiKey"}>
             <div className="modalHeader">
               <p className="modalTitle">API Key</p>
               <Icon
                 iconName="ChromeClose"
-                className="bw-Icon modalClose"
+                className="indexnow-Icon modalClose"
                 onClick={() => {
                   setModalState(DashboardModalState.Hidden);
                 }}
@@ -624,14 +624,14 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         )}
         {modalState === DashboardModalState.EditPrefAutoSubmissionModal && (
-          <div className="modalContainer bw-ModalEditPreferenceAutoSubmissions">
+          <div className="modalContainer indexnow-ModalEditPreferenceAutoSubmissions">
             <div className="modalHeader">
               <p className="modalTitle">
                 Edit preference for Automate URL Submission
               </p>
               <Icon
                 iconName="ChromeClose"
-                className="bw-Icon modalClose"
+                className="indexnow-Icon modalClose"
                 onClick={() => {
                   setModalState(DashboardModalState.Hidden);
                 }}
@@ -675,12 +675,12 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         )}
 
         {modalState === DashboardModalState.SubmitUrlModal && (
-          <div className="modalContainer bw-ModalUrlSubmit">
+          <div className="modalContainer indexnow-ModalUrlSubmit">
             <div className="modalHeader">
               <p className="modalTitle">Manual URL submission</p>
               <Icon
                 iconName="ChromeClose"
-                className="bw-Icon modalClose"
+                className="indexnow-Icon modalClose"
                 onClick={() => {
                   setModalState(DashboardModalState.Hidden);
                 }}

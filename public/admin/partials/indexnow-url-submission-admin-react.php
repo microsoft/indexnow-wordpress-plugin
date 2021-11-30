@@ -1,7 +1,7 @@
-<div id="bwAppRoot"></div>
+<div id="indexNowAppRoot"></div>
 <script>
     (function( $ ) {
-        var bwApp = $('#bwAppRoot');
+        var bwApp = $('#indexNowAppRoot');
         if (bwApp) {
             var wp_body = bwApp.parents()[0];
             var update_nags = wp_body.querySelectorAll('.update-nag');
