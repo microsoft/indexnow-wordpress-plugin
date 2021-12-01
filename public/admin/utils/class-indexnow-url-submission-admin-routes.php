@@ -6,8 +6,8 @@
  *
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/admin-routes
- * @author     Bing Webmaster <bingwpus@microsoft.com>
- */
+ * @author     IndexNow <bingwpus@microsoft.com>
+*/
 class BWT_IndexNow_Admin_Routes {
 
     /**
@@ -28,11 +28,11 @@ class BWT_IndexNow_Admin_Routes {
 	 */
 	private $version;
 
-	private $prefix = "bwt-indexnow-";
+	private $prefix = "indexnow-";
 
-	public static $passed_submissions_table = "bwt_indexnow_passed_submissions";
+	public static $passed_submissions_table = "indexnow_passed_submissions";
 
-	public static $failed_submissions_table = "bwt_indexnow_failed_submissions";
+	public static $failed_submissions_table = "indexnow_failed_submissions";
 
 	/**
 	 * Initialize the class and set its properties.
@@ -69,14 +69,14 @@ class BWT_IndexNow_Admin_Routes {
             ),
 		) );
 
-		$endpoint = '/apiKeyValidity/';
-		register_rest_route( $namespace, $endpoint, array(
-            array(
-                'methods'               => \WP_REST_Server::READABLE,
-                'callback'              => array( $this, 'check_api_key_validity' ),
-                'permission_callback'   => array( $this, 'admin_permissions_check' ),
-            ),
-		) );
+		// $endpoint = '/apiKeyValidity/';
+		// register_rest_route( $namespace, $endpoint, array(
+        //     array(
+        //         'methods'               => \WP_REST_Server::READABLE,
+        //         'callback'              => array( $this, 'check_api_key_validity' ),
+        //         'permission_callback'   => array( $this, 'admin_permissions_check' ),
+        //     ),
+		// ) );
 
 		$endpoint = '/apiSettings/';
 		register_rest_route( $namespace, $endpoint, array(
@@ -188,42 +188,42 @@ class BWT_IndexNow_Admin_Routes {
 		return $this->try_catch(array($request, array($this, 'call_delete_submissions')), array($this, 'validate_api_key'));
 	}
 
-	private function check_bwt_api_key( $api_key ) {
-		$siteUrl = get_home_url();
-		$data = "{\n\t\"siteUrl\":\"".$siteUrl."\"}";
-		$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/CheckSiteVerification?apikey=" . $api_key . "&client=wp_v_" . $this->version . "&siteUrl=" . $siteUrl);
+    // private function check_bwt_api_key( $api_key ) {
+	// 	$siteUrl = get_home_url();
+	// 	$data = "{\n\t\"siteUrl\":\"".$siteUrl."\"}";
+	// 	$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/CheckSiteVerification?apikey=" . $api_key . "&client=wp_v_" . $this->version . "&siteUrl=" . $siteUrl);
 
-		if (is_wp_error( $response )) {
-			if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-			    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
-			}
-			return "error:WP_Error";
-		}
-		if (isset($response['errors'])) {
-			return "error:RequestFailed";
-		}
-		try {
-			if ($response['response']['code'] === 200) {
-				$is_verified = json_decode($response['body'])->{'d'};
-				if (is_bool($is_verified) && $is_verified) {
-					return "success";
-				}
-				else {
-					return "error:NotVerified";
-				}
-			} else {
-				if ($response['response']['code'] >= 500 || $response['response']['code'] === 404) {
-					return "error:" . $response['response']['message'];
-				} else {
-					$message = json_decode($response['body'])->{'Message'};
-					return "error:" . $message;
-				}
-			}
-		}
-		catch (\Throwable $th) {
-			return "error:RequestFailed";
-		}
-	}
+	// 	if (is_wp_error( $response )) {
+	// 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
+	// 		    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
+	// 		}
+	// 		return "error:WP_Error";
+	// 	}
+	// 	if (isset($response['errors'])) {
+	// 		return "error:RequestFailed";
+	// 	}
+	// 	try {
+	// 		if ($response['response']['code'] === 200) {
+	// 			$is_verified = json_decode($response['body'])->{'d'};
+	// 			if (is_bool($is_verified) && $is_verified) {
+	// 				return "success";
+	// 			}
+	// 			else {
+	// 				return "error:NotVerified";
+	// 			}
+	// 		} else {
+	// 			if ($response['response']['code'] >= 500 || $response['response']['code'] === 404) {
+	// 				return "error:" . $response['response']['message'];
+	// 			} else {
+	// 				$message = json_decode($response['body'])->{'Message'};
+	// 				return "error:" . $message;
+	// 			}
+	// 		}
+	// 	}
+	// 	catch (\Throwable $th) {
+	// 		return "error:RequestFailed";
+	// 	}
+	// }
 
 	private function resubmit_single_submission($siteUrl, $api_key, $submission, &$responses) {
 		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
@@ -307,10 +307,8 @@ class BWT_IndexNow_Admin_Routes {
 				)
 			);
 
-		// $data = "{\n\t\"siteUrl\":\"".$site_url."\",\n\"url\":\"".$url."\"\n}";
-		// $response = wp_remote_post( "https://www.bing.com/webmaster/api.svc/json/WPSubmitUrl?apikey=" . $api_key . "&auto=" . ($is_manual_submission ? "0" : "1") . "&type=" . $type . "&client=wp_v_" . $this->version . "&siteUrl=" . $siteUrl, array( 'body' => $data,
-		// 	'headers' => array( 'Content-Type' => 'application/json') ) );
-
+		error_log(__METHOD__ . " error:WP_Error : ") ;
+		error_log(__METHOD__ . " error : ".$response['response']['message']) ;
 		if (is_wp_error( $response )) {
 			if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
 			    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
@@ -321,14 +319,25 @@ class BWT_IndexNow_Admin_Routes {
 			return 'error:RequestFailed';
 		}
 		try {
-			if ( 200 === $response['response']['code'] ) {
+			if ( 200 === $response['response']['code'] || 202 === $response['response']['code'] ) {
 				return 'success';
 			} else {
-				if ( $response['response']['code'] >= 500 ) {
-					return 'error:' . $response['response']['message'];
-				} else {
-					$message = json_decode( $response['body'] );
-					return 'error:' . $message;
+				if ( 400 === $response['response']['code'] ) {
+					return 'error:InvalidRequest';
+				} else 
+				 if ( 403 === $response['response']['code'] ) {
+					 return 'error:InvalidApiKey';
+				 } else 
+				 if ( 422 === $response['response']['code'] ) {
+					 return 'error:InvalidUrl';
+				 }else 
+				if ( 429 === $response['response']['code'] ) {
+					return 'error:UnknownError';
+				}else {
+					return 'error: ' . $response['response']['message'];
+					if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " body : ". json_decode($response['body'])->message) ;
+					}
 				}
 			}
 		} catch ( \Throwable $th ) {
@@ -474,30 +483,29 @@ class BWT_IndexNow_Admin_Routes {
 		), 200 );
 	}
 
-	private function call_check_api_key_validity( $request, $admin_api_key ) {
-		$api_key = base64_decode($admin_api_key);
-		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
-		$response = $this->check_bwt_api_key($api_key);
-
-		if (substr($response, 0, 6) != "error:") {
-			if (!$is_valid_api_key || $is_valid_api_key === "2") {
-				// get the lastest options to avoid inconsistency
-				update_option( $this->prefix . 'is_valid_api_key', true );
-			}
-			return new \WP_REST_Response( array(
-				'error_type' => WP_IN_Errors::NoError
-				), 200 );
-		}
-		else {
-			$message = substr($response, 6);
-			$error_type = $this->get_api_error($message);
-			// get the lastest options to avoid inconsistency
-			update_option( $this->prefix . 'is_valid_api_key', "2" );
-			return new \WP_REST_Response( array(
-				'error_type' => $error_type
-				), 200 );
-		}
-	}
+	// private function call_check_api_key_validity( $request, $admin_api_key ) {
+	// 	$api_key = base64_decode($admin_api_key);
+	// 	$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
+	// 	$response = $this->check_bwt_api_key($api_key);
+	// 	if (substr($response, 0, 6) != "error:") {
+	// 		if (!$is_valid_api_key || $is_valid_api_key === "2") {
+	// 			// get the lastest options to avoid inconsistency
+	// 			update_option( $this->prefix . 'is_valid_api_key', true );
+	// 		}
+	// 		return new \WP_REST_Response( array(
+	// 			'error_type' => WP_IN_Errors::NoError
+	// 			), 200 );
+	// 	}
+	// 	else {
+	// 		$message = substr($response, 6);
+	// 		$error_type = $this->get_api_error($message);
+	// 		// get the lastest options to avoid inconsistency
+	// 		update_option( $this->prefix . 'is_valid_api_key', "2" );
+	// 		return new \WP_REST_Response( array(
+	// 			'error_type' => $error_type
+	// 			), 200 );
+	// 	}
+	// }
 
 	private function call_get_api_settings( $request, $admin_api_key ) {
 		$auto_submission_enabled = get_option( $this->prefix . 'auto_submission_enabled' );
@@ -649,33 +657,17 @@ class BWT_IndexNow_Admin_Routes {
 
 	private function get_api_error($message, $isSite = false) {
 		switch ($message) {
+
 			case 'RequestFailed' : return WP_IN_Errors::WP_RequestFailed;
-			case 'NotVerified' : return WP_IN_Errors::NotVerified;
 			case 'Not Found' : return WP_IN_Errors::BWT_InvalidApiCall;
-			default : break;
-		}
-		if (strlen($message) < 9) {
-			return WP_IN_Errors::OtherError;
-		}
-		$error = substr($message, 9);
-		switch ($error) {
 			case 'InternalError' : return WP_IN_Errors::BWT_InternalError;
 			case 'UnknownError' : return WP_IN_Errors::BWT_UnknownError;
 			case 'InvalidApiKey' : return WP_IN_Errors::BWT_InvalidApiKey;
-			case 'ThrottleUser' : return WP_IN_Errors::BWT_ThrottleUser;
-			case 'ThrottleHost' : return WP_IN_Errors::BWT_ThrottleHost;
-			case 'UserBlocked' : return WP_IN_Errors::BWT_UserBlocked;
 			case 'InvalidUrl' : return WP_IN_Errors::BWT_InvalidUrl;
 			case 'InvalidParameter' : return WP_IN_Errors::BWT_InvalidParameter;
-			case 'UserNotFound' : return WP_IN_Errors::BWT_UserNotFound;
-			case 'NotFound' : return WP_IN_Errors::BWT_NotFound;
 			case 'NotAllowed' : return WP_IN_Errors::BWT_NotAllowed;
-			case 'NotAuthorized' : return WP_IN_Errors::BWT_NotAuthorized;
-			case 'ThrottleIP' : return WP_IN_Errors::BWT_ThrottleIP;
-			case 'InvalidToken' : return WP_IN_Errors::BWT_InvalidToken;
-			case 'SiteUriSchemeIsNotSupported' : return WP_IN_Errors::BWT_SiteUriSchemeIsNotSupported;
-			case 'AuthorizationFailed' : return $isSite ? WP_IN_Errors::BWT_AuthorizationFailed_Site : WP_IN_Errors::BWT_AuthorizationFailed_Url;
-			default : return $this->get_custom_api_error($error);
+			case 'InvalidRequest' : return WP_IN_Errors::InvalidRequest;
+			default : return $this->get_custom_api_error($message);
 		}
 	}
 
@@ -685,9 +677,6 @@ class BWT_IndexNow_Admin_Routes {
 		}
 		else if (stripos($error, "null") !== false) {
 			return WP_IN_Errors::BWT_NullException;
-		}
-		else if (stripos($error, "exceeded") !== false) {
-			return WP_IN_Errors::BWT_QuotaFull;
 		}
 		else {
 			return $error;
@@ -741,23 +730,10 @@ class WP_IN_Errors {
 	const BWT_InternalError = "Internal Server Error";
 	const BWT_UnknownError = "Unknown Error";
 	const BWT_InvalidApiKey = "Invalid API Key";
-	const BWT_ThrottleUser = "User Throttled";
-	const BWT_ThrottleHost = "Host Throttled";
-	const BWT_UserBlocked = "User Blocked";
 	const BWT_InvalidUrl = "Invalid Url";
 	const BWT_InvalidParameter = "Invalid Parameter";
-	const BWT_UserNotFound = "User Not Found";
-	const BWT_NotFound = "Not Found";
 	const BWT_NotAllowed = "Not Allowed";
-	const BWT_NotAuthorized = "Not Authorized";
-	const BWT_ThrottleIP = "IP Throttled";
-	const BWT_InvalidToken = "Invalid Token";
-	const BWT_SiteUriSchemeIsNotSupported = "Site Uri Scheme Is Not Supported";
-	const BWT_AuthorizationFailed_Site = "Site Not Registered/Verified In Bing Webmaster";
-	const BWT_AuthorizationFailed_Url = "URL Doesn't Belong To The Site";
-	const BWT_AuthorizationFailed = "Authorization Failed";
 	const BWT_NullException =  "Null Value Found";
-	const BWT_QuotaFull = "Quota Exceeded";
 	const BWT_InvalidApiCall = "Invalid API Call";
 	const OtherError = "Unknown Error Occured";
 }

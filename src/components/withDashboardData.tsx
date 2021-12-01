@@ -1,4 +1,4 @@
-import { IHttpResponse, useFetch, useSubmit } from "./APIHelper";
+import { IHttpResponse, useFetch, useSubmit } from "./IndexNowAPIHelper";
 import {
   ISetApiKeyRequest,
   IGetApiSettingsResponse,

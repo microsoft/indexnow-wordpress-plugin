@@ -8,7 +8,7 @@
  * @since      1.0.0
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/includes
- * @author     Bing Webmaster <bingwpus@microsoft.com>
+ * @author     IndexNow <bingwpus@microsoft.com>
  */
 class BWT_IndexNow_Activator {
 
@@ -23,14 +23,14 @@ class BWT_IndexNow_Activator {
 		$api_key = wp_generate_uuid4();
 		$api_key = preg_replace('[-]', '', $api_key);
 		error_log($api_key);
-		update_option( 'bwt-indexnow-is_valid_api_key', '2' );
-		update_option( 'bwt-indexnow-admin_api_key', base64_encode( $api_key ) );
+		update_option( 'indexnow-is_valid_api_key', '2' );
+		update_option( 'indexnow-admin_api_key', base64_encode( $api_key ) );
 	}
 
 	public static function add_passed_submissions_table() {
 		global $wpdb;
 	
-		$table_name = $wpdb->prefix . 'bwt_indexnow_passed_submissions';
+		$table_name = $wpdb->prefix . 'indexnow_passed_submissions';
 		
 		$charset_collate = $wpdb->get_charset_collate();
 	
@@ -51,7 +51,7 @@ class BWT_IndexNow_Activator {
 	public static function add_failed_submissions_table() {
 		global $wpdb;
 	
-		$table_name = $wpdb->prefix . 'bwt_indexnow_failed_submissions';
+		$table_name = $wpdb->prefix . 'indexnow_failed_submissions';
 		
 		$charset_collate = $wpdb->get_charset_collate();
 	

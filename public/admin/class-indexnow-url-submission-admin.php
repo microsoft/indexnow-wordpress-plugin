@@ -27,7 +27,7 @@ class BWT_IndexNow_Admin {
 	 */
 	private $version;
 
-	private $prefix = "bwt-indexnow-";
+	private $prefix = "indexnow-";
 
 	private $routes;
 	
@@ -36,7 +36,7 @@ class BWT_IndexNow_Admin {
 	 *
 	 * @since    0.01.01
 	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param      string    $version           The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -81,9 +81,9 @@ class BWT_IndexNow_Admin {
 			   }
 		}
 
-		wp_localize_script( $this->plugin_name, 'wpr_object', array(
+		wp_localize_script( $this->plugin_name, 'indexnow_wpr_object', array(
 			'api_nonce'   => wp_create_nonce( 'wp_rest' ),
-			'api_url'	  => rest_url( $this->plugin_name . '/v_' . $this->version .'/' ),
+			'indexnow_api_url'	  => rest_url( $this->plugin_name . '/v_' . $this->version .'/' ),
 			)
 		);
 
@@ -133,7 +133,7 @@ class BWT_IndexNow_Admin {
 	{
 		/*
 		*  Documentation : https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
-			*/
+		*/
 		$settings_link = array(
 			'<a href="' . admin_url('admin.php?page=' . $this->plugin_name) . '">' . __('Settings', $this->plugin_name) . '</a>',
 		);

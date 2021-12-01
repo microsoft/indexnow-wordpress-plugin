@@ -1,10 +1,10 @@
 import { ErrorConstants } from "./ErrorConstants";
 
 declare global {
-    interface Window { wpr_object: any; }
+    interface Window { indexnow_wpr_object: any; }
 }
 
-const baseURL = `${window['wpr_object']['api_url']}`;
+const baseURL = `${window['indexnow_wpr_object']['indexnow_api_url']}`;
 
 export interface IHttpResponse<T> extends Response {
   data?: T;
@@ -24,7 +24,7 @@ export interface IAPIErrorDetails {
 
 const nonceHeader = {
   headers: {
-    "X-WP-Nonce": `${window['wpr_object']['api_nonce']}`
+    "X-WP-Nonce": `${window['indexnow_wpr_object']['api_nonce']}`
   }
 };
 

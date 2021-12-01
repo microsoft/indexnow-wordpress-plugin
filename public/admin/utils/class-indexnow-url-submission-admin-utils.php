@@ -6,8 +6,8 @@
  *
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/admin-utils
- * @author     Bing Webmaster <bingwpus@microsoft.com>
- */
+ * @author     IndexNow <bingwpus@microsoft.com>
+*/
 class BWT_IndexNow_Admin_Utils {
 
 	/**
@@ -115,9 +115,9 @@ class BWT_IndexNow_Admin_Utils {
 		$api_key = wp_generate_uuid4();
 		$api_key = preg_replace('[-]', '', $api_key);
 		error_log($api_key);
-		update_option( 'bwt-indexnow-is_valid_api_key', '2' );
-		update_option( 'bwt-indexnow-admin_api_key', base64_encode( $api_key ) );
-		update_option( 'bwt-indexnow-is_valid_api_key', '1' );
+		update_option( 'indexnow-is_valid_api_key', '2' );
+		update_option( 'indexnow-admin_api_key', base64_encode( $api_key ) );
+		update_option( 'indexnow-is_valid_api_key', '1' );
 	}
 }
 
