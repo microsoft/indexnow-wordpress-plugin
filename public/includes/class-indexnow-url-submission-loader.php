@@ -9,7 +9,7 @@
  *
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/includes
- * @author     IndexNow <bingwpus@microsoft.com>
+ * @author     Microsoft Bing <bingwpus@microsoft.com>
 */
 class BWT_IndexNow_Loader {
 

@@ -10,7 +10,7 @@
  * Plugin URI:        https://www.bing.com/webmaster
  * Description:       A small plugin to allow Url submissions to IndexNow.
  * Version:           1.0.0
- * Author:            IndexNow
+ * Author:            Microsoft Bing
  * Author URI:        https://www.bing.com/indexnow
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt

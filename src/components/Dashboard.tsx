@@ -554,11 +554,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             Maximum of 20 successful and 20 failed submissions in last 48hrs
             will be displayed.
           </p>
-          {/* <p>
-            For more information, login to{" "}
-            <a href={StringConstants.BingWebmasterLink}>Bing Webmaster Tools</a>
-            .
-          </p> */}
+          <p>
+            Learn more about {" "}
+            <a href={StringConstants.IndexNowLink} target="_blank">Index Now!</a>
+          </p>
         </div>
       </div>
       <div

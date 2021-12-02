@@ -5,7 +5,7 @@
  *
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/admin
- * @author     Index Now <bingwpus@microsoft.com>
+ * @author     Microsoft Bing <bingwpus@microsoft.com>
  */
 class BWT_IndexNow_Admin {
 
