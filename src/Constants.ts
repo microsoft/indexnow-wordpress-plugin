@@ -2,7 +2,7 @@ export class StringConstants {
   static readonly ApiKeyHelpLink =
     "https://docs.microsoft.com/en-us/bingwebmaster/getting-access#using-api-key";
   static readonly IndexNowLink = "https://www.indexnow.org/";
-  static readonly PluginInfoLink = "https://aka.ms/BingWordpressPluginAbout";
+  static readonly PluginInfoLink = "https://docs.microsoft.com/en-us/bingwebmaster/indexnow-wordpress-plugin";
   static readonly ApiKeyValidationError =
     "Invalid API key! (Should be alphanumeric and 32 characters in length.)";
   // static readonly domain = "example.com";
