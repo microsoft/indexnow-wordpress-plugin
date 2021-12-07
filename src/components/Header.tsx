@@ -38,7 +38,7 @@ export const Header: React.FunctionComponent = () => {
           <span className="indexNowLogo desktopOnly">{logosvg}</span>
           {/* <span className="indexNowLogoMobile mobileOnly">{mobileLogoSvg}</span> */}
           <span className="pageTitle">
-            Index Now Url Submission Plugin
+            Microsoft IndexNow Plugin
           </span>
         </div>
         <div className="headerRightElements floatRight">

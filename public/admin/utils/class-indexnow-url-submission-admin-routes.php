@@ -303,12 +303,13 @@ class BWT_IndexNow_Admin_Routes {
 				'https://www.bing.com/indexnow/',
 				array(
 					'body'    => $data,
-					'headers' => array( 'Content-Type' => 'application/json' ),
+					'headers' => array( 
+						'Content-Type'  => 'application/json',
+						'X-Source-Info' => 'wordpress_' . $this->version . '_' . $is_manual_submission
+					),
 				)
 			);
 
-		error_log(__METHOD__ . " error:WP_Error : ") ;
-		error_log(__METHOD__ . " error : ".$response['response']['message']) ;
 		if (is_wp_error( $response )) {
 			if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
 			    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;

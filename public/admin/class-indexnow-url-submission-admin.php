@@ -105,8 +105,8 @@ class BWT_IndexNow_Admin {
 		 * Add a menu page for this plugin.
 		 */
 		add_menu_page(
-			__('Index Now Url Submission', $this->plugin_name),
-			__('Index Now', $this->plugin_name),
+			__('Microsoft IndexNow Plugin', $this->plugin_name),
+			__('MS IndexNow', $this->plugin_name),
 			'manage_options',
 			$this->plugin_name,
 			array($this, 'display_plugin_admin_page'),

@@ -359,13 +359,12 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
              <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Manual URL submission"
-              tooltip="This feature allows you to submit a URL directly into the Bing index."
+              tooltip="This feature allows you to submit a URL directly to IndexNow supporting search engines."
               leadingIconName="Send"
               className={apiKeyInvalid ? "indexnow-Disabled" : ""}
             >
               <p className="cardDescription">
-                This feature allows you to submit a URL directly into the Bing
-                index.
+                This feature allows you to submit a URL directly to IndexNow supporting search engines.
               </p>
               <DefaultButton
                 disabled={apiKeyInvalid}
@@ -387,7 +386,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               className={
                 "indexnow-Card-WithPopOver " + (apiKeyInvalid ? "indexnow-Disabled" : "")
               }
-              tooltip="This feature allows to configure automation to submit new, updated & deleted URLs to Bing and stay updated."
+              tooltip="This feature allows to configure automation to submit new, updated & deleted URLs to IndexNow and stay updated."
               leadingIconName="Rocket"
             >
               <p className="cardDescription">
@@ -639,7 +638,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <div className="modalContent">
               <p className="modalDescription">
                 We recommend you to enable automation to submit new, updated &
-                deleted URLs to Bing and stay updated.
+                deleted URLs to IndexNow and stay updated.
               </p>
               <ChoiceGroup
                 selectedKey={selectedOptionAutoSubmissions}
