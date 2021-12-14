@@ -188,43 +188,6 @@ class BWT_IndexNow_Admin_Routes {
 		return $this->try_catch(array($request, array($this, 'call_delete_submissions')), array($this, 'validate_api_key'));
 	}
 
-    // private function check_bwt_api_key( $api_key ) {
-	// 	$siteUrl = get_home_url();
-	// 	$data = "{\n\t\"siteUrl\":\"".$siteUrl."\"}";
-	// 	$response = wp_remote_get( "https://www.bing.com/webmaster/api.svc/json/CheckSiteVerification?apikey=" . $api_key . "&client=wp_v_" . $this->version . "&siteUrl=" . $siteUrl);
-
-	// 	if (is_wp_error( $response )) {
-	// 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-	// 		    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
-	// 		}
-	// 		return "error:WP_Error";
-	// 	}
-	// 	if (isset($response['errors'])) {
-	// 		return "error:RequestFailed";
-	// 	}
-	// 	try {
-	// 		if ($response['response']['code'] === 200) {
-	// 			$is_verified = json_decode($response['body'])->{'d'};
-	// 			if (is_bool($is_verified) && $is_verified) {
-	// 				return "success";
-	// 			}
-	// 			else {
-	// 				return "error:NotVerified";
-	// 			}
-	// 		} else {
-	// 			if ($response['response']['code'] >= 500 || $response['response']['code'] === 404) {
-	// 				return "error:" . $response['response']['message'];
-	// 			} else {
-	// 				$message = json_decode($response['body'])->{'Message'};
-	// 				return "error:" . $message;
-	// 			}
-	// 		}
-	// 	}
-	// 	catch (\Throwable $th) {
-	// 		return "error:RequestFailed";
-	// 	}
-	// }
-
 	private function resubmit_single_submission($siteUrl, $api_key, $submission, &$responses) {
 		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
 		$failed_count = get_option( $this->prefix . 'failed_count' );
@@ -300,7 +263,7 @@ class BWT_IndexNow_Admin_Routes {
 		);
 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) error_log($data);
 			$response = wp_remote_post(
-				'https://www.bing.com/indexnow/',
+				' https://api.indexnow.org/indexnow/',
 				array(
 					'body'    => $data,
 					'headers' => array( 
@@ -483,30 +446,6 @@ class BWT_IndexNow_Admin_Routes {
 			'error_type' => WP_IN_Errors::InvalidRequest
 		), 200 );
 	}
-
-	// private function call_check_api_key_validity( $request, $admin_api_key ) {
-	// 	$api_key = base64_decode($admin_api_key);
-	// 	$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
-	// 	$response = $this->check_bwt_api_key($api_key);
-	// 	if (substr($response, 0, 6) != "error:") {
-	// 		if (!$is_valid_api_key || $is_valid_api_key === "2") {
-	// 			// get the lastest options to avoid inconsistency
-	// 			update_option( $this->prefix . 'is_valid_api_key', true );
-	// 		}
-	// 		return new \WP_REST_Response( array(
-	// 			'error_type' => WP_IN_Errors::NoError
-	// 			), 200 );
-	// 	}
-	// 	else {
-	// 		$message = substr($response, 6);
-	// 		$error_type = $this->get_api_error($message);
-	// 		// get the lastest options to avoid inconsistency
-	// 		update_option( $this->prefix . 'is_valid_api_key', "2" );
-	// 		return new \WP_REST_Response( array(
-	// 			'error_type' => $error_type
-	// 			), 200 );
-	// 	}
-	// }
 
 	private function call_get_api_settings( $request, $admin_api_key ) {
 		$auto_submission_enabled = get_option( $this->prefix . 'auto_submission_enabled' );

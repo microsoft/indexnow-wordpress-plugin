@@ -38,10 +38,10 @@ export const Header: React.FunctionComponent = () => {
           <span className="indexNowLogo desktopOnly">{logosvg}</span>
           {/* <span className="indexNowLogoMobile mobileOnly">{mobileLogoSvg}</span> */}
           <span className="pageTitle">
-            Microsoft IndexNow Plugin
+          IndexNow Plugin
           </span>
         </div>
-        <div className="headerRightElements floatRight">
+        {/* <div className="headerRightElements floatRight">
           <span
             title="Help"
             onClick={() =>
@@ -52,7 +52,7 @@ export const Header: React.FunctionComponent = () => {
             <span className="desktopOnly">About this plugin</span>
             <Icon iconName="Info" className="indexnow-Icon" />
           </span>
-        </div>
+        </div> */}
       </header>
     </>
   );

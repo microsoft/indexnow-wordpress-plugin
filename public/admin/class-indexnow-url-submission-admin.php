@@ -105,8 +105,8 @@ class BWT_IndexNow_Admin {
 		 * Add a menu page for this plugin.
 		 */
 		add_menu_page(
-			__('Microsoft IndexNow Plugin', $this->plugin_name),
-			__('MS IndexNow', $this->plugin_name),
+			__('IndexNow Plugin', $this->plugin_name),
+			__('IndexNow', $this->plugin_name),
 			'manage_options',
 			$this->plugin_name,
 			array($this, 'display_plugin_admin_page'),
@@ -231,7 +231,7 @@ class BWT_IndexNow_Admin {
 			header( 'Content-Type: text/plain' );
 			header( 'X-Robots-Tag: noindex' );
 			status_header( 200 );
-			echo $api_key;
+			esc_html_e($api_key);
 
 			exit();
 		}

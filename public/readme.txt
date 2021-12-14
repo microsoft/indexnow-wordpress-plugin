@@ -1,4 +1,4 @@
-=== Microsoft IndexNow Plugin ===
+=== IndexNow Plugin ===
 Contributors: bingwebmastertools
 Plugin link: https://bing.com/indexnow
 Tags: seo, crawling
@@ -9,7 +9,7 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 Requires PHP: 5.6.20
 
-Microsoft IndexNow Plugin for WordPress enables site owners to instantly and automatically submit their new/updated
+IndexNow Plugin for WordPress enables site owners to instantly and automatically submit their new/updated
 pages to supporting search engines.
 
 
@@ -24,12 +24,20 @@ Some other handy features included in the plugin:
 * View list of recent URL submissions from the plugin.
 * Retry any failed submissions from the recent submissions list.
 * Download recent URL submissions for analysis.
-* Stats on recent successful and failed submissions
+* Status on recent successful and failed submissions
 
 You can browse the code at the [GitHub repository](https://github.com/microsoft/indexnow-wordpress-plugin).
 
-This plugin was developed with love and coffee by the Microsoft Bing team.
+This plugin was developed with love and coffee by the Bing Webmaster team.
 
+== Installation ==
+
+You just need to install the plugin and set up automatic submission of new pages in your WordPress site. It's that simple!
+
+- Log in to WordPress admin panel for your WordPress site. Click on 'Plugins > Add New'. 
+- Search for 'IndexNow Plugin' and install.
+- Once installed, click on 'Activate' to enable plugin. 
+- Go to IndexNow admin page and click 'Let's Get Started!'.
 
 == Frequently Asked Questions ==
 
@@ -39,11 +47,11 @@ To generate a new API key, please de-activate and re-activate the plugin. It wil
 
 = How can I delete any stored data in my WordPress database? =
 
-You can go to ‘Plugins’ page from your WordPress sidebar and click on Deactivate under Microsoft IndexNow plugin. This will remove the API key integration as well as any locally stored data about submitted URLs. Reactivating the plugin will present you with a clean slate. 
+You can go to ‘Plugins’ page from your WordPress sidebar and click on Deactivate under IndexNow plugin. This will remove the API key integration as well as any locally stored data about submitted URLs. Reactivating the plugin will present you with a clean slate. 
 
-= I cannot see all the URLs submitted on my dashboard? Where can I view all my submissions made via Microsoft IndexNow WordPress plugin? 
+= I cannot see all the URLs submitted on my dashboard? Where can I view all my submissions made via IndexNow plugin? 
 
-We are providing a limited number of URLs submitted on the WordPress dashboard (20 successful and 20 failed). Please reach out to individual search engines for more details. However, if you wish to see the URLs submitted, specifically for Microsoft Bing, please login and verify your site on Bing webmaster tools and you can view more submissions via [URL submission Tool](https://www.bing.com/webmasters/submiturl).
+We are providing a limited number of URLs submitted on the WordPress dashboard (20 successful and 20 failed). Please reach out to individual search engines for more details.
 
 = I can’t see the URLs in search engines indexed? =
 
