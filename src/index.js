@@ -7,8 +7,7 @@ import { initializeIcons } from "@fluentui/react/lib/Icons";
 
 initializeIcons();
 
-var rootElement = document.getElementById("bwAppRoot");
-
+var rootElement = document.getElementById("indexNowAppRoot");
 if (rootElement !== null) {
   ReactDOM.render(
     <React.StrictMode>

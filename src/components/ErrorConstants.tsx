@@ -14,6 +14,6 @@ export const ErrorConstants = {
     UrlNotAllowed: {
       Code: "UrlNotAllowed",
       Message:
-        "We found that the URL submitted for block is important for Bing users and hence cannot be blocked through Bing Webmaster tools."
+        "We found that the URL submitted for block is important for IndexNow users and hence cannot be blocked through Bing Webmaster tools."
     }
   };

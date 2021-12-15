@@ -5,7 +5,7 @@
  *
  * @package    BWT_IndexNow
  * @subpackage BWT_IndexNow/admin
- * @author     Index Now <bingwpus@microsoft.com>
+ * @author     Microsoft Bing <bingwpus@microsoft.com>
  */
 class BWT_IndexNow_Admin {
 
@@ -27,7 +27,7 @@ class BWT_IndexNow_Admin {
 	 */
 	private $version;
 
-	private $prefix = "bwt-indexnow-";
+	private $prefix = "indexnow-";
 
 	private $routes;
 	
@@ -36,7 +36,7 @@ class BWT_IndexNow_Admin {
 	 *
 	 * @since    0.01.01
 	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param      string    $version           The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -81,9 +81,9 @@ class BWT_IndexNow_Admin {
 			   }
 		}
 
-		wp_localize_script( $this->plugin_name, 'wpr_object', array(
+		wp_localize_script( $this->plugin_name, 'indexnow_wpr_object', array(
 			'api_nonce'   => wp_create_nonce( 'wp_rest' ),
-			'api_url'	  => rest_url( $this->plugin_name . '/v_' . $this->version .'/' ),
+			'indexnow_api_url'	  => rest_url( $this->plugin_name . '/v_' . $this->version .'/' ),
 			)
 		);
 
@@ -105,12 +105,12 @@ class BWT_IndexNow_Admin {
 		 * Add a menu page for this plugin.
 		 */
 		add_menu_page(
-			__('Index Now Url Submission', $this->plugin_name),
-			__('Index Now', $this->plugin_name),
+			__('IndexNow Plugin', $this->plugin_name),
+			__('IndexNow', $this->plugin_name),
 			'manage_options',
 			$this->plugin_name,
 			array($this, 'display_plugin_admin_page'),
-			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNC45MiIgaGVpZ2h0PSIyMS4zMjgiIHZpZXdCb3g9IjAgMCAxNC45MiAyMS4zMjgiPg0KICAgIDxnIGZpbGw9IiNmZmYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMxMS41IC03OTYuMTY5KSI+DQogICAgICAgIDxwYXRoIGQ9Ik0tMzExLjUsNzk2LjE2OWw0LjI2MSwxLjV2MTVsNi0zLjQ2NC0yLjk0Mi0xLjM4LTEuODU2LTQuNjIsOS40NTYsMy4zMjJ2NC44M2wtMTAuNjU2LDYuMTQ2LTQuMjYzLTIuMzcxWiI+PC9wYXRoPg0KICAgIDwvZz4NCjwvc3ZnPg=='
+			'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNCAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2LjkyMjUgMEMxOC4yNDc4IDAuMDE1MzgxOCAxOS41Njc5IDAuMTY5NTY0IDIwLjg2MTUgMC40NjAwNzNDMjEuNDI2MiAwLjU4Njg5NSAyMS44NDg0IDEuMDYwOTIgMjEuOTEyNiAxLjYzOTkzTDIyLjIxOTkgNC40MTYwMkMyMi4zNTg5IDUuNjkwNjUgMjMuNDI3NiA2LjY1NjA3IDI0LjcwMTggNi42NTc0MkMyNS4wNDQzIDYuNjU3OTYgMjUuMzgzIDYuNTg2MTUgMjUuNjk5NSA2LjQ0NTE0TDI4LjIyODQgNS4zMjY0N0MyOC43NTQzIDUuMDkzOCAyOS4zNjg4IDUuMjIwNjUgMjkuNzYxNSA1LjY0Mjk1QzMxLjU4OSA3LjYwODQ0IDMyLjk1MDEgOS45NjU3NSAzMy43NDI0IDEyLjUzNzVDMzMuOTEzMiAxMy4wOTIgMzMuNzE2NiAxMy42OTQ2IDMzLjI1MjMgMTQuMDM5MUwzMS4wMTA5IDE1LjcwMjlDMzAuMzcxNCAxNi4xNzYgMjkuOTkzOSAxNi45MjczIDI5Ljk5MzkgMTcuNzI2NEMyOS45OTM5IDE4LjUyNTIgMzAuMzcxNCAxOS4yNzY1IDMxLjAxMjIgMTkuNzUwN0wzMy4yNTU4IDIxLjQxNTFDMzMuNzIgMjEuNzU5NSAzMy45MTY4IDIyLjM2MjIgMzMuNzQ2IDIyLjkxNjlDMzIuOTU0IDI1LjQ4ODEgMzEuNTkzNyAyNy44NDUyIDI5Ljc2NzIgMjkuODExMUMyOS4zNzQ5IDMwLjIzMzIgMjguNzYwOCAzMC4zNjA2IDI4LjIzNSAzMC4xMjg0TDI1LjY5NTcgMjkuMDA4MUMyNC45Njk0IDI4LjY4OCAyNC4xMzUgMjguNzM0OSAyMy40NDg1IDI5LjEzNDVDMjIuNzYyIDI5LjUzNCAyMi4zMDUxIDMwLjIzODUgMjIuMjE3OSAzMS4wMzIyTDIxLjkxMjYgMzMuODA4QzIxLjg0OTcgMzQuMzgwNCAyMS40MzY0IDM0Ljg1MTMgMjAuODgwMiAzNC45ODQ2QzE4LjI2NSAzNS42MTExIDE1LjU0MDIgMzUuNjExMSAxMi45MjQ5IDM0Ljk4NDZDMTIuMzY4NSAzNC44NTEzIDExLjk1NTMgMzQuMzgwNCAxMS44OTI0IDMzLjgwOEwxMS41ODc1IDMxLjAzNjRDMTEuNDk4IDMwLjI0NDIgMTEuMDQwNSAyOS41NDE4IDEwLjM1NDUgMjkuMTQzNkM5LjY2ODUyIDI4Ljc0NTUgOC44MzU1OCAyOC42OTg4IDguMTExNTUgMjkuMDE3MUw1LjU3MTc5IDMwLjEzNzVDNS4wNDU3MiAzMC4zNjk2IDQuNDMxNTQgMzAuMjQyMyA0LjAzOTMgMjkuODE5OUMyLjIxMTc2IDI3Ljg1MTggMC44NTE0MDggMjUuNDkxOSAwLjA2MDU3NDcgMjIuOTE3OEMtMC4xMDk3NDcgMjIuMzYzNSAwLjA4NzA1ODYgMjEuNzYxMSAwLjU1MTA1IDIxLjQxNjlMMi43OTU5MyAxOS43NTE1QzMuNDM1MzggMTkuMjc4NCAzLjgxMzAzIDE4LjUyNzEgMy44MTMwMyAxNy43MjgxQzMuODEzMDMgMTYuOTI5MSAzLjQzNTM4IDE2LjE3NzggMi43OTUxMyAxNS43MDQxTDAuNTUxNjI4IDE0LjA0MTVDMC4wODY5MzU5IDEzLjY5NzIgLTAuMTEwMDUgMTMuMDk0MSAwLjA2MDg3ODEgMTIuNTM5MkMwLjg1MzA2OSA5Ljk2NzU2IDIuMjE0MTUgNy42MTAyNSA0LjA0MTY5IDUuNjQ0NzZDNC40MzQzNiA1LjIyMjQ3IDUuMDQ4ODMgNS4wOTU2MiA1LjU3NDgyIDUuMzI4MjlMOC4xMDMyNSA2LjQ0Njc2QzguODMwODIgNi43NjgyOSA5LjY2NzIyIDYuNzE5NzIgMTAuMzU2OSA2LjMxMzk5QzExLjA0MzYgNS45MTI4OSAxMS41MDA3IDUuMjA3NjcgMTEuNTg5IDQuNDEzODlMMTEuODk2MSAxLjYzOTkzQzExLjk2MDIgMS4wNjA2MyAxMi4zODI5IDAuNTg2NDM2IDEyLjk0NzkgMC40NTk4OTFDMTQuMjQzMSAwLjE2OTg1NSAxNS41NjQ0IDAuMDE1NzI3MyAxNi45MjI1IDBaTTE5Ljc0NzcgMTAuNDU0NUgxMy44MzlMMTkuNDQ1OCAxNy43MjczTDE0LjQzOTIgMjQuMTE2NkMxNC4yNTM4IDI0LjM1MzEgMTQuMjk0IDI0LjY5NjEgMTQuNTI4NyAyNC44ODI3QzE0LjYyNDQgMjQuOTU4NyAxNC43NDI1IDI1IDE0Ljg2NDQgMjVIMTkuNzQ3N0MxOS45MTUxIDI1IDIwLjA3MjkgMjQuOTIyMiAyMC4xNzU2IDI0Ljc4OTFMMjUuMTkxMSAxOC4yODQ3QzI1LjQ0NDIgMTcuOTU2NyAyNS40NDQyIDE3LjQ5NzYgMjUuMTkxMSAxNy4xNjk2TDIwLjE3NTYgMTAuNjY1NUMyMC4wNzI5IDEwLjUzMjQgMTkuOTE1MSAxMC40NTQ1IDE5Ljc0NzcgMTAuNDU0NVpNMTIuNzA5IDExLjkxNDVMOC42MjIwMiAxNy4xNjY1QzguNDAyMzkgMTcuNDQ4NyA4LjM3MDk4IDE3LjgyOTEgOC41Mjc4NCAxOC4xMzk0TDguNjIxOTUgMTguMjg4TDEyLjIzNiAyMi45MzM4TDEyLjMyNTIgMjMuMDI0NEMxMi41MjU5IDIzLjE4NTEgMTIuODA0OSAyMy4xNzkzIDEyLjk5NzggMjMuMDI2TDEzLjA4NjQgMjIuOTM3MUwxNS40OTkgMTkuODgyOEMxNS42MjQgMTkuNzI0NiAxNS42NDk2IDE5LjUxMzggMTUuNTc1NCAxOS4zMzRMMTUuNTAxMiAxOS4yMDY0TDE0LjM0NzggMTcuNzI3M0wxNS43NTg1IDE1LjkxNjRMMTIuNzA5IDExLjkxNDVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K'
 		);
 	}
 
@@ -133,7 +133,7 @@ class BWT_IndexNow_Admin {
 	{
 		/*
 		*  Documentation : https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
-			*/
+		*/
 		$settings_link = array(
 			'<a href="' . admin_url('admin.php?page=' . $this->plugin_name) . '">' . __('Settings', $this->plugin_name) . '</a>',
 		);
@@ -231,7 +231,7 @@ class BWT_IndexNow_Admin {
 			header( 'Content-Type: text/plain' );
 			header( 'X-Robots-Tag: noindex' );
 			status_header( 200 );
-			echo $api_key;
+			esc_html_e($api_key);
 
 			exit();
 		}

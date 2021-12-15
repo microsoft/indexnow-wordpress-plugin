@@ -1,9 +1,9 @@
 @import "./default";
 
 // Page header css
-.bw-Header {
+.indexnow-Header {
   width: 100%;
-  background: #0075D4;
+  background: #990000;
   color: $bwt_white;
   padding-left: calc((100% - #{$bwt_pageContentWidth})/2);
   padding-right: calc((100% - #{$bwt_pageContentWidth})/2);
@@ -21,7 +21,7 @@
       cursor: pointer;
       font-size: 12px;
 
-      .bw-Icon {
+      .indexnow-Icon {
         color: $bwt_white;
         vertical-align: middle;
       }
@@ -32,14 +32,12 @@
     }
   }
 
-  .bingLogo {
+  .indexNowLogo {
     margin: 0 16px 0 0;
-    border-right: $bwt_pageTitleBorder;
-    padding-right: 16px;
     height: 42px;
   }
 
-  .bingLogoMobile {
+  .indexNowLogoMobile {
     padding-right: 8px;
   }
 

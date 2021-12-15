@@ -18,7 +18,7 @@ export const Card: React.FunctionComponent<ICardProps> = (props) => {
   };
 
   return (
-    <div className={"bw-Card " + props.className || ""}>
+    <div className={"indexnow-Card " + props.className || ""}>
       <div className="cardHeader">
         <span className="cardTitle">
           <Icon iconName={props.leadingIconName} className="cardTitleIcon" />

@@ -6,11 +6,11 @@
  * @package           BWT_IndexNow
  *
  * @wordpress-plugin
- * Plugin Name:       Index Now Url Submission
+ * Plugin Name:       IndexNow
  * Plugin URI:        https://www.bing.com/webmaster
  * Description:       A small plugin to allow Url submissions to IndexNow.
  * Version:           1.0.0
- * Author:            IndexNow
+ * Author:            Microsoft Bing
  * Author URI:        https://www.bing.com/indexnow
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -33,7 +33,7 @@ define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.0' );
  * Plugin name.
  */
 
-define( 'BWT_INDEXNOW_PLUGIN_NAME', 'indexnow-url-submission' );
+define( 'BWT_INDEXNOW_PLUGIN_NAME', 'indexnow' );
 
 /**
  * The code that runs during plugin activation.

@@ -44,18 +44,18 @@ export const App: React.FunctionComponent = () => {
   };
 
   return (
-    <div className="bw-App">
+    <div className="indexnow-App">
       <Header />
-      <div className="bw-MainContainer">
+      <div className="indexnow-MainContainer">
         {bannerList.map((bannerItem, index) => {
           return (
             <div
               className={
-                "bw-Banner" +
-                (bannerItem.length <= 0 ? " bw-BannerHidden" : "") +
+                "indexnow-Banner" +
+                (bannerItem.length <= 0 ? " indexnow-BannerHidden" : "") +
                 (bannerItem.indexOf("Success") > -1
-                  ? " bw-BannerSuccess"
-                  : " bw-BannerFailure")
+                  ? " indexnow-BannerSuccess"
+                  : " indexnow-BannerFailure")
               }
             >
               <span>{bannerItem}</span>

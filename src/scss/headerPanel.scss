@@ -173,7 +173,7 @@
       }
 
       &.activeClass {
-        background: #0075D4;
+        background: #990000;
         color: $bwt_white;
         &:hover {
           background: $bwt_headerElementsHoverBackGroundColor;
@@ -342,7 +342,7 @@
       transition: max-height 0.2s ease-in-out;
     }
     a {
-      color: #0075D4;
+      color: #990000;
       cursor: pointer;
     }
   }
@@ -380,7 +380,7 @@
       height: 100%;
       top: 0;
       left: 0;
-      background: $#0075D4;
+      background: $#990000;
       border-radius: 2px 0 0 2px;
     }
     .messageActions {
