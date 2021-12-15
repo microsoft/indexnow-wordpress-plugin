@@ -12,7 +12,6 @@ import {
   IRetryFailedSubmissionsRequest,
   ISetAutoSubmissionEnabledResponse,
   ISetAutoSubmissionEnabledRequest,
-  ICheckApiKeyValidityResponse,
   UrlSubmission,
 } from "./Interfaces";
 
@@ -41,15 +40,6 @@ export async function SetApiKey(apiKey: string) {
   return response;
 }
 
-export async function CheckApiKeyValidity() {
-  let response: IHttpResponse<ICheckApiKeyValidityResponse>;
-  const url = `apiKeyValidity`;
-  response = await useFetch<ICheckApiKeyValidityResponse>(url).catch((err) => {
-    console.error("Error while checking API key validity.");
-    return err;
-  });
-  return response;
-}
 
 export async function GetApiSettings() {
   let response: IHttpResponse<IGetApiSettingsResponse>;

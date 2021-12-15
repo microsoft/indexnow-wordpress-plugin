@@ -15,9 +15,6 @@ export interface ISetApiKeyResponse extends ApiResponse {
   error_type: string;
 }
 
-export interface ICheckApiKeyValidityResponse extends ApiResponse {
-  error_type: string;
-}
 
 export interface IGetApiSettingsResponse extends ApiResponse {
   AutoSubmissionEnabled: boolean;
