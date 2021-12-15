@@ -11,7 +11,7 @@
 class BWT_IndexNow_Admin_Utils {
 
 	/**
-	 * This function finds out the ocunt of submissions in last 48 hours.
+	 * This function finds out the count of submissions in last 48 hours.
 	 */
 	public static function get_count( IndexNowSubmissionCount $submission_count ) {
 		$curr_time = time();

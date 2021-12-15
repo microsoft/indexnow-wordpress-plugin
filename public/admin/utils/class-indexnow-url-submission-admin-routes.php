@@ -69,15 +69,6 @@ class BWT_IndexNow_Admin_Routes {
             ),
 		) );
 
-		// $endpoint = '/apiKeyValidity/';
-		// register_rest_route( $namespace, $endpoint, array(
-        //     array(
-        //         'methods'               => \WP_REST_Server::READABLE,
-        //         'callback'              => array( $this, 'check_api_key_validity' ),
-        //         'permission_callback'   => array( $this, 'admin_permissions_check' ),
-        //     ),
-		// ) );
-
 		$endpoint = '/apiSettings/';
 		register_rest_route( $namespace, $endpoint, array(
             array(
@@ -151,10 +142,6 @@ class BWT_IndexNow_Admin_Routes {
 
 	public function update_api_key( $request ) {
 		return $this->try_catch($request, array($this, 'call_update_api_key'));
-	}
-
-	public function check_api_key_validity( $request ) {
-		return $this->try_catch(array($request, array($this, 'call_check_api_key_validity')), array($this, 'validate_api_key'));
 	}
 
 	public function get_api_settings( $request ) {
@@ -525,15 +512,10 @@ class BWT_IndexNow_Admin_Routes {
 		// save the options, incase they got updated
 		update_option( $this->prefix . 'failed_count', $failed_count );
 		update_option( $this->prefix . 'passed_count', $passed_count );
-		// $quota = -1;
-		// if ($is_valid_api_key && $is_valid_api_key === "1") {
-		// 	$siteUrl = get_home_url();
-		// 	$quota = $this->get_site_quota(base64_decode($admin_api_key), $siteUrl);
-		// }
+
 		return new \WP_REST_Response( array(
 			'FailedSubmissionCount' => $fail_count,
 			'PassedSubmissionCount' => $pass_count,
-			// 'Quota' => $quota,
 			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
