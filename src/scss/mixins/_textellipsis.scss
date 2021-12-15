@@ -1,0 +1,36 @@
+﻿// Text ellipsis 
+
+// Add display block or inline-block depends on the element
+@mixin singleLineEllipsis() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin multiLineEllipsis($lineHeight: 1.2em, $lineCount: 2, $bgColor: white) {
+  overflow: hidden;
+  position: relative;
+  line-height: $lineHeight;
+  max-height: $lineHeight * $lineCount;
+  text-align: justify;
+  margin-right: -1em;
+  padding-right: 1em;
+  word-break: break-all;
+
+  &:before {
+    content: '...';
+    position: absolute;
+    right: .5em;
+    bottom: 0;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    right: .5em;
+    width: 1em;
+    height: 1em;
+    margin-top: 0.2em;
+    background: $bgColor;
+  }
+}

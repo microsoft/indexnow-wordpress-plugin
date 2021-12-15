@@ -1,0 +1,5 @@
+// Add display block or inline-block depends on the element
+@mixin displayIB() {
+    display: inline-block;
+    vertical-align: middle;
+}

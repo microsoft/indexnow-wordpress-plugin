@@ -1,0 +1,187 @@
+@import "default";
+
+.indexnow-App {
+  h2 {
+    @include font-type($bwt_scopeFontFamily, $bwt_focusFontSize);
+  }
+
+  h3 {
+    @include font-type($bwt_scopeFontFamily, $bwt_mediumFontSize);
+  }
+
+  .floatLeft {
+    float: left;
+  }
+
+  .floatRight {
+    float: right;
+  }
+
+  h2 {
+    @include font-type($bwt_scopeFontFamily, $bwt_focusFontSize);
+  }
+
+  h3 {
+    @include font-type($bwt_scopeFontFamily, $bwt_mediumFontSize);
+  }
+
+  .textCenter {
+    text-align: center;
+  }
+
+  .textRight {
+    text-align: right;
+  }
+
+  .floatNone {
+    float: none;
+  }
+
+  .b_hide {
+    display: none;
+  }
+
+  .colorBlack {
+    color: $bwt_darkGray50Color;
+  }
+
+  .clearfix {
+    @include clearfix;
+  }
+
+  .pageLayout {
+    background: $bwt_lightGray30Color;
+  }
+
+  .pageContainer {
+    display: flex;
+    min-height: calc(100vh - #{$bwt_topHeaderHeight});
+    margin-top: $bwt_topHeaderHeight;
+  }
+
+  a {
+    text-decoration: none;
+
+    &:focus,
+    &:active,
+    &:hover {
+      outline: none;
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  i {
+    font-size: $bwt_smallIconSize;
+    color: $bwt_darkGray30Color;
+  }
+
+  .bwtIconTxtPair {
+    > * {
+      @include displayIB();
+    }
+
+    i {
+      margin-right: 8px;
+    }
+  }
+
+  .warningIcon {
+    color: $bwt_warningColor;
+  }
+
+  .errorIcon {
+    color: $bwt_errorColor;
+  }
+
+  .infoIcon {
+    font-size: 10px;
+    padding-left: 4px;
+    color: $bwt_lightGray60Color;
+  }
+
+  .globalPanelMask {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+
+    .maskSpinner {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+  }
+
+  .validationError {
+    margin-top: 10px;
+    color: $bwt_errorColor;
+  }
+
+  .siteUrlInfo {
+    .siteUrl {
+      display: -webkit-inline-box;
+      max-width: 100%;
+      height: auto;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+    }
+    &:hover {
+      .siteUrl:after {
+        background: $bwt_rowHoverColor;
+      }
+
+      .siteUrl:before {
+        color: transparent;
+      }
+      .siteUrl {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .secondaryInfo {
+    margin-top: 4px;
+    color: $bwt_darkGray20Color;
+    font-size: $bwt_secondaryFontSize;
+  }
+
+  .bwtToolTip {
+    text-align: left;
+    display: block;
+    padding: 8px 8px 6px 8px;
+    min-width: 115px;
+    .toolTipUrl {
+      word-break: break-all;
+      white-space: initial;
+      font-size: $bwt_secondaryFontSize;
+    }
+
+    i {
+      cursor: pointer;
+      color: $bwt_primaryTextColor;
+      margin-left: 0px;
+    }
+  }
+  .errorPageContainerLayout {
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .iconButtonMenu {
+    width: 100%;
+  }
+
+  .moreEdgedCell {
+    padding-top: 5px;
+    padding-right: 4px;
+    padding-bottom: 0px;
+  }
+}

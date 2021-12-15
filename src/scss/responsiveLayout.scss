@@ -1,0 +1,31 @@
+@import "./default";
+
+// mobile
+@media (max-width: 782px) {
+
+  .desktopOnly {
+    display: none;
+  }
+
+  .indexnow-Header {
+    padding: 0 12px;
+
+    .headerLeftElements {
+      padding-left: 16px;
+    }
+
+    .headerRightElements {
+      padding-right: 16px;
+    }
+  }
+
+}
+
+// non-mobile
+@media (min-width: 783px) {
+
+  .mobileOnly {
+    display: none;
+  }
+
+}
