@@ -4,7 +4,6 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { PrimaryButton } from "@fluentui/react/lib/Button";
 import { Icon } from "@fluentui/react/lib/Icon";
-import { TextField } from "@fluentui/react/lib/TextField";
 import { SetApiKey } from "./withDashboardData";
 import { ApiKeyRegex, StringConstants } from "../Constants";
 import { GetApiKey } from "./withDashboardData";
@@ -67,34 +66,6 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
 
       <div className="keyEntrySection">
         <div className="keyEntryCard">
-          {/* <h3>Add API Key To Get Started</h3>
-          <p>
-            Add valid API key and automate URL submission by clicking on Start
-            using this plugin. You can disable auto submission later from plugin
-            if needed.
-          </p>
-          <TextField
-            // type="password"
-            readOnly={true}
-            className="apiKeyTextField"
-            value={apiKey}
-            onChange={(event, item) => {
-              setApiKey(item || "");
-            }}
-            placeholder="Enter 32 digit API key"
-            validateOnLoad={false}
-            onGetErrorMessage={() => {
-              return !ApiKeyRegex.test(apiKey) || apiKey.length !== 32
-                ? StringConstants.ApiKeyValidationError
-                : "";
-            }}
-          />
-          <p>
-            Don"t have API key?{" "}
-            <a href={StringConstants.ApiKeyHelpLink} target="_blank">
-              Click here to know how to generate.
-            </a>
-          </p> */}
           <p>
           IndexNow, Easy to use protocol that websites can call to notify whenever website contents on any URL is updated or created allowing instant crawling, and discovery of the URL
           </p>

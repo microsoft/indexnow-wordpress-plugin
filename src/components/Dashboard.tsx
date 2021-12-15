@@ -11,8 +11,6 @@ import {
   RetryFailedSubmissions,
   SubmitUrl,
   UpdateAutoSubmissionsEnabled,
-  SetApiKey,
-  CheckApiKeyValidity,
   GetApiKey
 } from "./withDashboardData";
 import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
@@ -32,7 +30,6 @@ import {
 } from "./Interfaces";
 import { Card } from "./Card";
 import { StringConstants, ApiKeyRegex, SubmitUrlRegex } from "../Constants";
-import { tr } from "date-fns/locale";
 
 interface IDashboardProps {
   addBanner: (str: string) => void;
@@ -89,20 +86,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   const [urlSubmitted, setUrlSubmitted] = useState<number>(0);
   const [apiSettingsUpdated, setApiSettingsUpdated] = useState<number>(0);
   const [apiKeyUpdated, setApiKeyUpdated] = useState<number>(0);
-
-  // Check if API key is valid
-  // useEffect(() => {
-  //   Promise.resolve(CheckApiKeyValidity()).then((response) => {
-  //     if (response && response.data) {
-  //       if (response.data.error_type.length !== 0) {
-  //         props.addBanner(
-  //           "API Key Validation Error: Please check if site is verified or API key is valid to enable Automatic & Manual URL submission."
-  //         );
-  //         setApiKeyInvalid(true);
-  //       }
-  //     }
-  //   });
-  // }, []);
 
   // Get API settings
   useEffect(() => {
@@ -229,22 +212,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     );
   };
 
-  const onClickUpdateApiKey = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    setModalState(DashboardModalState.Hidden);
-    Promise.resolve(SetApiKey(textFieldValueApiKey)).then((response) => {
-      if (response && response.data) {
-        setApiKeyUpdated(apiKeyUpdated + 1);
-        if (response.data.error_type.length === 0) {
-          props.addBanner("Success : API key is updated successfully.");
-        } else {
-          props.addBanner("Error : Unable to update API key.");
-        }
-      }
-    });
-  };
-
   const onClickUpdateAutoSubmissions = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
@@ -316,46 +283,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         }
       >
         <div className="indexnow-CardRow">
-          {/* <div className="indexnow-CardColumn indexnow-CardColumn-2 indexnow-ApiKeyCard"> */}
-            {/* <Card
-              title="API Key"
-              tooltip="API Key is a unique identifier that is used to authenticate API requests."
-              leadingIconName="Permissions"
-              className="indexnow-Card-WithPopOver"
-            >
-              <p className="cardDescription">
-                ********************************
-              </p>
-            </Card>
-            <div
-              className="indexnow-PopOverMenu"
-              onMouseEnter={() => {
-                setShowApiKeyPopOverMenu(true);
-              }}
-              onMouseLeave={() => {
-                setShowApiKeyPopOverMenu(false);
-              }}
-            >
-              <Icon iconName="MoreVertical" className="moreIcon" />
-              <div className="popOverContainer">
-                <ul
-                  className={
-                    "popOverPanel" +
-                    (showApiKeyPopOverMenu ? " openPopOverMenu" : "")
-                  }
-                >
-                  <li
-                    onClick={() => {
-                      // reset UI controls and display modal
-                     // setTextFieldValueApiKey("");
-                      setModalState(DashboardModalState.UpdateApiKeyModal);
-                    }}
-                  >
-                    Show key
-                  </li>
-                </ul>
-              </div>
-            </div> */}
              <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Manual URL submission"
@@ -438,44 +365,9 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         </div>
 
-        <div className="indexnow-CardRow">
-          {/* <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-ManualURLSubmissionCard">
-            <Card
-              title="Manual URL submission"
-              tooltip="This feature allows you to submit a URL directly into the Bing index."
-              leadingIconName="Send"
-              className={apiKeyInvalid ? "indexnow-Disabled" : ""}
-            >
-              <p className="cardDescription">
-                This feature allows you to submit a URL directly into the Bing
-                index.
-              </p>
-              <DefaultButton
-                disabled={apiKeyInvalid}
-                onClick={() => {
-                  // reset UI controls and display modal
-                  setTextFieldValueUrlSubmit("");
-                  setModalState(DashboardModalState.SubmitUrlModal);
-                }}
-                className="buttonSubmitUrl"
-                text="Submit URL"
-              />
-            </Card>
-          </div> */}
-        </div>
 
-        {/* <h2 className="sectionTitle">Overview</h2> */}
         <div className="indexnow-CardRow">
           <div className="indexnow-OverviewSection">
-            {/* <div className="infoCards">
-              <h4>Quota left for the day</h4>
-              <h2>
-                {submissionStats && submissionStats.Quota !== null
-                  ? submissionStats.Quota
-                  : "-"}
-              </h2>
-              <p>(Resets at 00:00 GMT)</p>
-            </div> */}
             <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Successful submissions"
@@ -594,23 +486,8 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                     : "";
                 }}
               />
-              {/* <p>
-                Don’t have API key?{" "}
-                <a href={StringConstants.ApiKeyHelpLink}>
-                  Click here to know how to generate.
-                </a>
-              </p> */}
             </div>
             <div className="modalFooter">
-              {/* <PrimaryButton
-                className="button primaryButton"
-                text="Update"
-                onClick={onClickUpdateApiKey}
-                disabled={
-                  !ApiKeyRegex.test(textFieldValueApiKey) ||
-                  textFieldValueApiKey.length !== 32
-                }
-              /> */}
               <DefaultButton
                 className="button secondaryButton"
                 text="Got it"
