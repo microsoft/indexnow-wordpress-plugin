@@ -79,7 +79,7 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "clean": "rimraf build publish",
-    "zip": "mkdir publish && cd build/ && copy ..\\*.md . && copy ..\\LICENSE.txt . && rimraf index.html && bestzip ../publish/plugin.zip *"
+    "zip": "mkdir publish && cd build/ && copy ..\\*.md . && copy ..\\LICENSE.txt . && rimraf index.html && bestzip ../publish/IndexNow.zip *"
   },
   "eslintConfig": {
     "extends": "react-app"
