@@ -250,12 +250,12 @@ class BWT_IndexNow_Admin_Routes {
 		);
 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) error_log($data);
 			$response = wp_remote_post(
-				' https://api.indexnow.org/indexnow/',
+				'https://api.indexnow.org/indexnow/',
 				array(
 					'body'    => $data,
 					'headers' => array( 
 						'Content-Type'  => 'application/json',
-						'X-Source-Info' => 'wordpress_' . $this->version . '_' . $is_manual_submission
+						'X-Source-Info' => 'https://wordpress.com/' . $this->version . '/' . $is_manual_submission
 					),
 				)
 			);
