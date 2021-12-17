@@ -1,4 +1,6 @@
 import "../scss/Header.scss";
+import { Icon } from "@fluentui/react/lib/Icon";
+import { StringConstants } from "../Constants";
 
 import * as React from "react";
 
@@ -23,6 +25,18 @@ export const Header: React.FunctionComponent = () => {
           <span className="indexNowLogo desktopOnly">{logosvg}</span>
           <span className="pageTitle">
           IndexNow Plugin
+          </span>
+        </div>
+        <div className="headerRightElements floatRight">
+          <span
+            title="Help"
+            onClick={() =>
+              window.open(StringConstants.PluginInfoLink, "_blank")
+            }
+            key="headerHelp"
+          >
+            <span className="desktopOnly">About this plugin</span>
+            <Icon iconName="Info" className="bw-Icon" />
           </span>
         </div>
       </header>
