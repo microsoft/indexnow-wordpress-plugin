@@ -41,6 +41,10 @@ We are providing a limited number of URLs submitted on the WordPress dashboard (
 Indexing of URLs is specific and dependent on each search engine’s rules, please reach out to individual search engine for debugging and resolution.
 
 
+### 1.0.1
+
+-Text domain fix and minor changes.
+
 ### 1.0.0
 
 - Initial release.

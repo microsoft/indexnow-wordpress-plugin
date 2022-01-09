@@ -114,7 +114,6 @@ class BWT_IndexNow_Admin_Utils {
 	{
 		$api_key = wp_generate_uuid4();
 		$api_key = preg_replace('[-]', '', $api_key);
-		error_log($api_key);
 		update_option( 'indexnow-is_valid_api_key', '2' );
 		update_option( 'indexnow-admin_api_key', base64_encode( $api_key ) );
 		update_option( 'indexnow-is_valid_api_key', '1' );

@@ -4,7 +4,7 @@ Plugin link: https://bing.com/indexnow
 Tags: seo, crawling
 Requires at least: 5.3
 Tested up to: 5.8
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 Requires PHP: 5.6.20
@@ -59,6 +59,9 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 
 
 == Changelog ==
+
+= 1.0.1 =
+* Text domain fix and minor changes.
 
 = 1.0.0 =
 * Initial release.
