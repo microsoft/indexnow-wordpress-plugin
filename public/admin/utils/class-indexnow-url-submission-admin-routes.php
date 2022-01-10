@@ -248,7 +248,7 @@ class BWT_IndexNow_Admin_Routes {
 				 'urlList'     => array( $url ),
 			)
 		);
-		if ( true === WP_DEBUG && true === WP_DEBUG_LOG) error_log($data);
+
 			$response = wp_remote_post(
 				'https://api.indexnow.org/indexnow/',
 				array(
@@ -399,7 +399,7 @@ class BWT_IndexNow_Admin_Routes {
 			$json = json_decode($body);
 			if (isset($json->APIKey) && !empty($json->APIKey)) {
 				$apiKey = sanitize_text_field($json->APIKey);
-				if (preg_match('/^[a-f0-9]{32}$/i', $json->APIKey)) {
+				if (preg_match('/^[a-z0-9]{32}$/i', $json->APIKey)) {
 					
 					// get the lastest options to avoid inconsistency
 					update_option($this->prefix . 'admin_api_key', base64_encode($apiKey));

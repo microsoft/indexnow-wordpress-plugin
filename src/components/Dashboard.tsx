@@ -447,7 +447,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </p>
           <p>
             Learn more about {" "}
-            <a href={StringConstants.IndexNowLink} target="_blank">Index Now!</a>
+            <a href={StringConstants.IndexNowLink} target="_blank">IndexNow!</a>
           </p>
         </div>
       </div>
