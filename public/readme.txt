@@ -37,7 +37,7 @@ You just need to install the plugin and set up automatic submission of new pages
 - Log in to WordPress admin panel for your WordPress site. Click on 'Plugins > Add New'. 
 - Search for 'IndexNow Plugin' and install.
 - Once installed, click on 'Activate' to enable plugin. 
-- Go to IndexNow admin page and click 'Let's Get Started!'.
+- Go to IndexNow admin page under 'Settings > IndexNow' and click 'Let's Get Started!'.
 
 == Frequently Asked Questions ==
 
@@ -61,6 +61,7 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 == Changelog ==
 
 = 1.0.1 =
+* Moving Admin menu under Settings.
 * Text domain fix and minor changes.
 
 = 1.0.0 =
