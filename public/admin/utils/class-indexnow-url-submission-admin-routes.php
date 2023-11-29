@@ -133,8 +133,8 @@ class BWT_IndexNow_Admin_Routes {
     }
 
 	public function admin_permissions_check( $request ) {
-        return current_user_can( "manage_options" );
-    }
+		return current_user_can( BWT_IndexNow_Admin_Utils::get_admin_capability() );
+	}
 
     public function get_api_key( $request ) {
 		return $this->try_catch($request, array($this, 'call_get_api_key'));
