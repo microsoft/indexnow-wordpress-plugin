@@ -40,6 +40,9 @@ We are providing a limited number of URLs submitted on the WordPress dashboard (
 
 Indexing of URLs is specific and dependent on each search engine’s rules, please reach out to individual search engine for debugging and resolution.
 
+### 1.0.2
+
+- Allow plugin owners of WordPress site to access Indexing Insights in Bing Webmaster tools.
 
 ### 1.0.1
 

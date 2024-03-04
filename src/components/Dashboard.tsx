@@ -11,7 +11,8 @@ import {
   RetryFailedSubmissions,
   SubmitUrl,
   UpdateAutoSubmissionsEnabled,
-  GetApiKey
+  GetApiKey,
+  GetIndexNowInsightsUrl
 } from "./withDashboardData";
 import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
 import {
@@ -27,9 +28,11 @@ import {
   IGetApiSettingsResponse,
   IGetAllSubmissionsResponse,
   UrlSubmission,
+  IGetInsightsUrlResponse,
 } from "./Interfaces";
 import { Card } from "./Card";
 import { StringConstants, ApiKeyRegex, SubmitUrlRegex } from "../Constants";
+import { IHttpResponse } from "./IndexNowAPIHelper";
 
 interface IDashboardProps {
   addBanner: (str: string) => void;
@@ -212,6 +215,19 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     );
   };
 
+  // Function handler for fetching URL for view Indexing Insights to Bing webmaster tools.
+  const viewInsightsOnClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    Promise.resolve(GetIndexNowInsightsUrl()).then(
+      (response : IHttpResponse<IGetInsightsUrlResponse>) => {
+        if (response && response.data) {
+          window.open(response.data?.InsightsUrl, "_blank")
+        }
+      }
+    );
+  };
+
   const onClickUpdateAutoSubmissions = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
@@ -282,6 +298,21 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           (modalState !== DashboardModalState.Hidden ? " darken" : "")
         }
       >
+        <div className="sectionTitleContainer">
+            <h2 className="sectionTitle">IndexNow Insights in Bing Webmaster tools</h2>
+        </div>
+        <div className="indexnow-CardRow">
+             <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-UrlSubmissions">
+                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIconName="Send" title="Indexnow Insights">
+                    <p className="cardDescription">
+                              IndexNow Insights feature in Bing Webmaster tools can be used to monitor the indexing status and performance of the URLs submitted via IndexNow on Bing.
+                    </p>
+                          <p style={{ marginLeft: "25px" }} >
+                        <DefaultButton onClick={viewInsightsOnClick} className="button submitButton" text="View Indexing Insights" />
+                    </p>
+                  </Card>
+             </div>
+        </div>
         <div className="indexnow-CardRow">
              <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card

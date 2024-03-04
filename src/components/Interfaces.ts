@@ -80,3 +80,8 @@ export interface SubmissionErrors {
   status: string;
   error_msg: string;
 }
+
+export interface IGetInsightsUrlResponse extends ApiResponse {
+  InsightsUrl: string;
+  error_type: string;
+}
