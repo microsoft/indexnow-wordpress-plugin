@@ -217,12 +217,18 @@ class BWT_IndexNow_Admin {
 	}
 	
 	/**
-	 *  Renders the IndexNow page for path site_url/{apikey}.txt.
+	 *  Renders the IndexNow page for path site_url/{apikey}.txt OR site_url/{bwtsiteauthkey}.ttl.
 	 *
 	 */
 	public function check_for_indexnow_page() {
 		$admin_api_key = get_option( $this->prefix . "admin_api_key" );
 		$api_key       = base64_decode( $admin_api_key );
+		
+		$admin_bwt_site_auth_key = get_option( $this->prefix . "admin_bwt_site_auth_key" );
+		$bwt_site_auth_key       = $admin_bwt_site_auth_key;
+
+		$admin_bwt_site_auth_timestamp  = get_option($this->prefix . "admin_bwt_site_auth_timestamp");
+		
 		global $wp;
 		$current_url = home_url( $wp->request );
 
@@ -231,8 +237,16 @@ class BWT_IndexNow_Admin {
 			header( 'X-Robots-Tag: noindex' );
 			status_header( 200 );
 			esc_html_e($api_key);
-
 			exit();
 		}
+
+		if ( isset( $current_url ) && trailingslashit( get_home_url() ) . $admin_bwt_site_auth_key . '.ttl' === $current_url ) {
+			header( 'Content-Type: text/plain' );
+			header( 'X-Robots-Tag: noindex' );
+			status_header( 200 );
+			esc_html_e($admin_bwt_site_auth_timestamp);			
+			exit();
+		}
+		
 	}
 }

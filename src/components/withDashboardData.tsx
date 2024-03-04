@@ -13,6 +13,7 @@ import {
   ISetAutoSubmissionEnabledResponse,
   ISetAutoSubmissionEnabledRequest,
   UrlSubmission,
+  IGetInsightsUrlResponse,
 } from "./Interfaces";
 
 export async function GetApiKey() {
@@ -116,5 +117,15 @@ export async function SubmitUrl(url: string) {
       return err;
     }
   );
+  return response;
+}
+
+export async function GetIndexNowInsightsUrl() {  
+  let response: IHttpResponse<IGetInsightsUrlResponse>;
+  const url = `getIndexNowInsightsUrl`;
+  response = await useFetch<IGetInsightsUrlResponse>(url).catch((err) => {
+    console.error("Error while fetching login URL of Bing webmaster tools.");
+    return err;
+  });
   return response;
 }

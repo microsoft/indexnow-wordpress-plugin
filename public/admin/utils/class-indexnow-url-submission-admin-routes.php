@@ -114,6 +114,15 @@ class BWT_IndexNow_Admin_Routes {
             ),
 		) );
 
+		$endpoint = '/getIndexNowInsightsUrl/';
+		register_rest_route( $namespace, $endpoint, array(
+            array(
+                'methods'               => \WP_REST_Server::READABLE,
+                'callback'              => array( $this, 'get_indexnow_insights_url' ),
+                'permission_callback'   => array( $this, 'admin_permissions_check' ),
+            ),
+		) );
+
 		register_rest_route( $namespace, $endpoint, array(
             array(
                 'methods'               => \WP_REST_Server::EDITABLE,
@@ -165,6 +174,10 @@ class BWT_IndexNow_Admin_Routes {
 
 	public function get_submissions( $request ) {
 		return $this->try_catch(array($request, array($this, 'call_get_submissions')), array($this, 'validate_api_key'));
+	}
+
+	public function get_indexnow_insights_url( $request ) {
+		return $this->try_catch(array($request, array($this, 'call_get_indexnow_insights_url')), array($this, 'validate_api_key'));
 	}
 
 	public function resubmit_submissions( $request ) {
@@ -530,6 +543,36 @@ class BWT_IndexNow_Admin_Routes {
 
 		return new \WP_REST_Response( array(
 			'Submissions' => $submissions,
+			'error_type' => WP_IN_Errors::NoError
+			), 200 );
+	}
+
+	private function call_get_indexnow_insights_url( $request, $admin_api_key ) {
+		
+		$bwt_site_auth_key = wp_generate_uuid4();
+		$updated = update_option( $this->prefix . 'admin_bwt_site_auth_key', $bwt_site_auth_key );
+		if ($updated == false) 
+		{
+			return new \WP_REST_Response( array(
+				'InsightsUrl' => "",
+				'error_type' => WP_IN_Errors::InvalidRequest
+				), 200 );
+		}
+		$currenttimestamp = time();
+		$updated = update_option( $this->prefix . 'admin_bwt_site_auth_timestamp', $currenttimestamp );
+		if ($updated == false) 
+		{
+			return new \WP_REST_Response( array(
+				'InsightsUrl' => "",
+				'error_type' => WP_IN_Errors::InvalidRequest
+				), 200 );
+		}
+
+		$siteUrl = get_home_url();
+		$insightsurl = "https://bing.com/webmasters/indexnow?siteUrl=" . $siteUrl . "&itoken=" . base64_encode($bwt_site_auth_key);
+		
+		return new \WP_REST_Response( array(
+			'InsightsUrl' => $insightsurl,
 			'error_type' => WP_IN_Errors::NoError
 			), 200 );
 	}
