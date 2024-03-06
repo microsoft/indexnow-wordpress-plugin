@@ -24,7 +24,8 @@ Some other handy features included in the plugin:
 * View list of recent URL submissions from the plugin.
 * Retry any failed submissions from the recent submissions list.
 * Download recent URL submissions for analysis.
-* Status on recent successful and failed submissions
+* Status on recent successful and failed submissions.
+* View IndexNow insights and more in Bing Webmaster tools.
 
 You can browse the code at the [GitHub repository](https://github.com/microsoft/indexnow-wordpress-plugin).
 
