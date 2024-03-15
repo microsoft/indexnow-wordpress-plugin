@@ -485,8 +485,14 @@ class BWT_IndexNow_Admin_Routes {
 		if (isset($body)) {
 			$json = json_decode($body);
 			if (isset($json->url) && !empty($json->url)) {
-				$url = sanitize_text_field($json->url);
-				if (empty($url) || !preg_match('/^(https?:\/\/([-\w\.]+)+(:\d+)?(\/([-\w\/_\.]*(\?\S+)?)?)?)$/i', $url, $matches)) {
+				$url = preg_replace_callback(
+					"/%[a-f0-9]{2}/", 
+					function($matches) {
+						return strtoupper($matches[0]);
+					}, 
+					sanitize_url($json->url)
+				);
+				if (empty($url) || filter_var($url, FILTER_VALIDATE_URL) === false) {
 					return new \WP_REST_Response( array(
 						'error' => WP_IN_Errors::InvalidInputUrl
 						), 200 );
