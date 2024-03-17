@@ -107,7 +107,7 @@ class BWT_IndexNow_Admin {
 		add_options_page(
 			__('IndexNow Plugin', $this->plugin_name),
 			__('IndexNow', $this->plugin_name),
-			'manage_options',
+			BWT_IndexNow_Admin_Utils::get_admin_capability(),
 			$this->plugin_name,
 			array($this, 'display_plugin_admin_page')
 			);
