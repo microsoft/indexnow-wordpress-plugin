@@ -124,7 +124,7 @@ class BWT_IndexNow {
 		$this->loader->add_filter( 'plugin_action_links_' . $plugin_basename, $plugin_admin, 'add_action_links' );
 
 		// Add url submit action & post publishing.
-		$this->loader->add_action( 'transition_post_status', $plugin_admin, 'on_post_published', 10, 3 );
+		$this->loader->add_action( 'transition_post_status', $plugin_admin, 'on_post_published', PHP_INT_MAX, 3 );
 	}
 
 	/**
