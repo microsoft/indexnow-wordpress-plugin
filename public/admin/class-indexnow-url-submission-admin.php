@@ -139,6 +139,67 @@ class BWT_IndexNow_Admin {
 		return array_merge($settings_link, $links);
 	}
 
+	/**
+	 * Check if a post/page has noindex directive set.
+	 * 
+	 * @param WP_Post $post The post object to check
+	 * @param string $url The URL to check for noindex headers
+	 * @return bool True if noindex is set, false otherwise
+	 */
+	private function has_noindex_directive($post, $url) {
+		// Check if WordPress site-wide search engine visibility is disabled
+		if (get_option('blog_public') == '0') {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " Site-wide search engine discouragement enabled");
+			}
+			return true;
+		}
+
+		// Check post meta for noindex (common SEO plugins use this)
+		$meta_robots = get_post_meta($post->ID, '_yoast_wpseo_meta-robots-noindex', true);
+		if ($meta_robots === '1') {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " Yoast noindex meta detected for post ID: " . $post->ID);
+			}
+			return true;
+		}
+
+		// Check RankMath noindex meta
+		$rankmath_robots = get_post_meta($post->ID, 'rank_math_robots', true);
+		if (is_array($rankmath_robots) && in_array('noindex', $rankmath_robots)) {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " RankMath noindex meta detected for post ID: " . $post->ID);
+			}
+			return true;
+		}
+
+		// Check All in One SEO meta
+		$aioseo_robots = get_post_meta($post->ID, '_aioseo_robots_noindex', true);
+		if ($aioseo_robots === '1') {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " All in One SEO noindex meta detected for post ID: " . $post->ID);
+			}
+			return true;
+		}
+
+		// Check HTTP headers for X-Robots-Tag noindex
+		$response = wp_safe_remote_head($url);
+		if (!is_wp_error($response)) {
+			$headers = wp_remote_retrieve_headers($response);
+			if (isset($headers['x-robots-tag'])) {
+				$robots_header = strtolower($headers['x-robots-tag']);
+				if (strpos($robots_header, 'noindex') !== false) {
+					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " X-Robots-Tag noindex header detected for URL: " . $url);
+					}
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	// This function checks the type of update on a page/post and accordingly calls the submit api if enabled
 	public function on_post_published($new_status, $old_status, $post)
 	{
@@ -191,6 +252,14 @@ class BWT_IndexNow_Admin {
 					if(empty($res_code) || ($res_code != 200 &&  $type != 'delete')){	
 						return;
 					}
+				}
+
+				// Check for noindex directive - don't submit URLs that should not be indexed
+				if ($type != 'delete' && $this->has_noindex_directive($post, $link)) {
+					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " Skipping URL submission due to noindex directive: " . $link);
+					}
+					return;
 				}
 
 				$siteUrl = get_home_url();
