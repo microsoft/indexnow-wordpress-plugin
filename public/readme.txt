@@ -17,6 +17,8 @@ pages to supporting search engines.
 
 IndexNow Plugin for WordPress enables automated submission of URLs from WordPress sites to the multiple search engines without the need to register and verify your site with them. Once installed, the plugin will automatically generate and host the API key on your site. It detects page creation/update/ deletion in WordPress and automatically submits the URLs in the background. This ensures that search engines will always have the latest updates about your site.
 
+The plugin automatically respects noindex directives to prevent submission of URLs that should not be indexed, including WordPress site-wide search engine visibility settings, SEO plugin noindex settings (Yoast, RankMath, All in One SEO), and X-Robots-Tag headers.
+
 Some other handy features included in the plugin:
 
 * Toggle the automatic submission feature.
@@ -61,6 +63,14 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 == Changelog ==
 
 = 1.0.2 =
+* Add noindex directive detection to prevent submission of URLs that should not be indexed.
+* Support for WordPress site-wide search engine visibility settings.
+* Support for popular SEO plugins (Yoast, RankMath, All in One SEO) noindex meta tags.
+* Support for X-Robots-Tag HTTP headers.
+* Improved logging for debugging noindex detection.
+* Allow plugin owners of WordPress site to access Indexing Insights in Bing Webmaster tools.
+
+= 1.0.1 =
 * Allow plugin owners of WordPress site to access Indexing Insights in Bing Webmaster tools.
 
 = 1.0.1 =

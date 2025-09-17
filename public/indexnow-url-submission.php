@@ -9,7 +9,7 @@
  * Plugin Name:       IndexNow
  * Plugin URI:        https://www.bing.com/webmaster
  * Description:       A small plugin to allow Url submissions to IndexNow.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Microsoft Bing
  * Author URI:        https://www.bing.com/indexnow
  * License:           GPL-2.0+
@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Currently plugin version.
  */
 
-define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.1' );
+define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.2' );
 
 /**
  * Plugin name.
