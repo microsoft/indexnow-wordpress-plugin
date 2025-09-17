@@ -183,11 +183,21 @@ class BWT_IndexNow_Admin {
 		}
 
 		// Check HTTP headers for X-Robots-Tag noindex
-		$response = wp_safe_remote_head($url);
+		// Use a short timeout to avoid delays in post publishing
+		$response = wp_safe_remote_head($url, array('timeout' => 5));
 		if (!is_wp_error($response)) {
 			$headers = wp_remote_retrieve_headers($response);
+			// Check both 'x-robots-tag' and 'X-Robots-Tag' (case insensitive)
+			$robots_header = '';
 			if (isset($headers['x-robots-tag'])) {
-				$robots_header = strtolower($headers['x-robots-tag']);
+				$robots_header = $headers['x-robots-tag'];
+			} elseif (isset($headers['X-Robots-Tag'])) {
+				$robots_header = $headers['X-Robots-Tag'];
+			}
+			
+			if (!empty($robots_header)) {
+				$robots_header = strtolower($robots_header);
+				// Check for noindex in various formats
 				if (strpos($robots_header, 'noindex') !== false) {
 					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
 						error_log(__METHOD__ . " X-Robots-Tag noindex header detected for URL: " . $url);
@@ -195,6 +205,8 @@ class BWT_IndexNow_Admin {
 					return true;
 				}
 			}
+		} elseif (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+			error_log(__METHOD__ . " Could not check X-Robots-Tag header for URL: " . $url . " - " . $response->get_error_message());
 		}
 
 		return false;
