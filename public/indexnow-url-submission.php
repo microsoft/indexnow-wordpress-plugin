@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Currently plugin version.
  */
 
-define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.2' );
+define( 'BWT_INDEXNOW_PLUGIN_VERSION', '1.0.3' );
 
 /**
  * Plugin name.
