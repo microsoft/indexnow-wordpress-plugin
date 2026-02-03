@@ -114,19 +114,19 @@ class BWT_IndexNow_Admin_Routes {
             ),
 		) );
 
+		register_rest_route( $namespace, $endpoint, array(
+            array(
+                'methods'               => \WP_REST_Server::EDITABLE,
+                'callback'              => array( $this, 'resubmit_submissions' ),
+                'permission_callback'   => array( $this, 'admin_permissions_check' ),
+            ),
+		) );
+
 		$endpoint = '/getIndexNowInsightsUrl/';
 		register_rest_route( $namespace, $endpoint, array(
             array(
                 'methods'               => \WP_REST_Server::READABLE,
                 'callback'              => array( $this, 'get_indexnow_insights_url' ),
-                'permission_callback'   => array( $this, 'admin_permissions_check' ),
-            ),
-		) );
-
-		register_rest_route( $namespace, $endpoint, array(
-            array(
-                'methods'               => \WP_REST_Server::EDITABLE,
-                'callback'              => array( $this, 'resubmit_submissions' ),
                 'permission_callback'   => array( $this, 'admin_permissions_check' ),
             ),
 		) );
