@@ -44,7 +44,6 @@
     "jest-watch-typeahead": "0.6.1",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "0.11.3",
-    "node-sass": "^4.13.1",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.2.1",
@@ -98,7 +97,8 @@
   },
   "devDependencies": {
     "bestzip": "^2.1.7",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "sass": "^1.97.3"
   },
   "jest": {
     "roots": [

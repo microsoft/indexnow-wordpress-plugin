@@ -18,7 +18,21 @@ export interface ISetApiKeyResponse extends ApiResponse {
 
 export interface IGetApiSettingsResponse extends ApiResponse {
   AutoSubmissionEnabled: boolean;
+  ExcludedPaths: string;
   SiteUrl: string;
+  error_type: string;
+}
+
+export interface IGetExcludedPathsResponse extends ApiResponse {
+  ExcludedPaths: string;
+  error_type: string;
+}
+
+export interface ISetExcludedPathsRequest {
+  ExcludedPaths: string;
+}
+
+export interface ISetExcludedPathsResponse extends ApiResponse {
   error_type: string;
 }
 

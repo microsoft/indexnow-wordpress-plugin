@@ -142,9 +142,11 @@ class BWT_IndexNow_Admin {
 
 	/**
 	 * Check if a post/page has noindex directive set.
+	 * This method fetches the actual rendered HTML and checks for the standard
+	 * <meta name="robots" content="noindex"> tag, which works with any SEO plugin.
 	 * 
 	 * @param WP_Post $post The post object to check
-	 * @param string $url The URL to check for noindex headers
+	 * @param string $url The URL to check for noindex
 	 * @return bool True if noindex is set, false otherwise
 	 */
 	private function has_noindex_directive($post, $url) {
@@ -156,58 +158,92 @@ class BWT_IndexNow_Admin {
 			return true;
 		}
 
-		// Check post meta for noindex (common SEO plugins use this)
-		$meta_robots = get_post_meta($post->ID, '_yoast_wpseo_meta-robots-noindex', true);
-		if ($meta_robots === '1') {
-			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
-				error_log(__METHOD__ . " Yoast noindex meta detected for post ID: " . $post->ID);
-			}
-			return true;
-		}
-
-		// Check RankMath noindex meta
-		$rankmath_robots = get_post_meta($post->ID, 'rank_math_robots', true);
-		if (is_array($rankmath_robots) && in_array('noindex', $rankmath_robots)) {
-			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
-				error_log(__METHOD__ . " RankMath noindex meta detected for post ID: " . $post->ID);
-			}
-			return true;
-		}
-
-		// Check All in One SEO meta
-		$aioseo_robots = get_post_meta($post->ID, '_aioseo_robots_noindex', true);
-		if ($aioseo_robots === '1') {
-			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
-				error_log(__METHOD__ . " All in One SEO noindex meta detected for post ID: " . $post->ID);
-			}
-			return true;
-		}
-
-		// Check HTTP headers for X-Robots-Tag noindex
+		// Fetch the page and check for noindex meta tag and X-Robots-Tag header
 		// Use a short timeout to avoid delays in post publishing
-		$response = wp_safe_remote_head($url, array('timeout' => 5));
-		if (!is_wp_error($response)) {
-			$headers = wp_remote_retrieve_headers($response);
-			// Check both 'x-robots-tag' and 'X-Robots-Tag' (case insensitive)
-			$robots_header = '';
-			if (isset($headers['x-robots-tag'])) {
-				$robots_header = $headers['x-robots-tag'];
-			} elseif (isset($headers['X-Robots-Tag'])) {
-				$robots_header = $headers['X-Robots-Tag'];
+		$response = wp_safe_remote_get($url, array(
+			'timeout' => 5,
+			'sslverify' => false, // Allow self-signed certs for local dev
+		));
+
+		if (is_wp_error($response)) {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " Could not fetch URL for noindex check: " . $url . " - " . $response->get_error_message());
 			}
-			
-			if (!empty($robots_header)) {
-				$robots_header = strtolower($robots_header);
-				// Check for noindex in various formats
-				if (strpos($robots_header, 'noindex') !== false) {
-					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
-						error_log(__METHOD__ . " X-Robots-Tag noindex header detected for URL: " . $url);
-					}
-					return true;
+			return false;
+		}
+
+		// Check X-Robots-Tag HTTP header
+		$headers = wp_remote_retrieve_headers($response);
+		$robots_header = '';
+		if (isset($headers['x-robots-tag'])) {
+			$robots_header = $headers['x-robots-tag'];
+		} elseif (isset($headers['X-Robots-Tag'])) {
+			$robots_header = $headers['X-Robots-Tag'];
+		}
+		
+		if (!empty($robots_header) && stripos($robots_header, 'noindex') !== false) {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " X-Robots-Tag noindex header detected for URL: " . $url);
+			}
+			return true;
+		}
+
+		// Check HTML meta robots tag
+		$body = wp_remote_retrieve_body($response);
+		if (!empty($body)) {
+			// Match <meta name="robots" content="...noindex..."> (case insensitive)
+			// Also check for googlebot, bingbot specific directives
+			if (preg_match('/<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex[^"\']*["\'][^>]*>/i', $body) ||
+				preg_match('/<meta[^>]+content=["\'][^"\']*noindex[^"\']*["\'][^>]+name=["\']robots["\'][^>]*>/i', $body)) {
+				if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+					error_log(__METHOD__ . " Meta robots noindex tag detected for URL: " . $url);
 				}
+				return true;
 			}
-		} elseif (true === WP_DEBUG && true === WP_DEBUG_LOG) {
-			error_log(__METHOD__ . " Could not check X-Robots-Tag header for URL: " . $url . " - " . $response->get_error_message());
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a URL path matches any excluded path patterns.
+	 * 
+	 * @param string $url The URL to check
+	 * @return bool True if URL should be excluded, false otherwise
+	 */
+	private function is_path_excluded($url) {
+		$excluded_paths = get_option($this->prefix . 'excluded_paths', '');
+		
+		if (empty($excluded_paths)) {
+			return false;
+		}
+
+		// Parse URL to get the path
+		$parsed_url = wp_parse_url($url);
+		$path = isset($parsed_url['path']) ? $parsed_url['path'] : '/';
+
+		// Split excluded paths by newline and filter empty lines
+		$patterns = array_filter(array_map('trim', explode("\n", $excluded_paths)));
+
+		foreach ($patterns as $pattern) {
+			// Skip empty patterns
+			if (empty($pattern)) {
+				continue;
+			}
+
+			// Support wildcard patterns (e.g., /private/*, /draft-*)
+			$regex_pattern = str_replace(
+				array('\*', '\?'),
+				array('.*', '.'),
+				preg_quote($pattern, '/')
+			);
+
+			if (preg_match('/^' . $regex_pattern . '$/i', $path)) {
+				if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+					error_log(__METHOD__ . " URL excluded by path pattern: " . $url . " matched " . $pattern);
+				}
+				return true;
+			}
 		}
 
 		return false;
@@ -271,6 +307,14 @@ class BWT_IndexNow_Admin {
 				if ($type != 'delete' && $this->has_noindex_directive($post, $link)) {
 					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
 						error_log(__METHOD__ . " Skipping URL submission due to noindex directive: " . $link);
+					}
+					return;
+				}
+
+				// Check for excluded paths - don't submit URLs that match excluded patterns
+				if ($this->is_path_excluded($link)) {
+					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " Skipping URL submission due to excluded path: " . $link);
 					}
 					return;
 				}

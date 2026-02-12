@@ -17,11 +17,12 @@ pages to supporting search engines.
 
 IndexNow Plugin for WordPress enables automated submission of URLs from WordPress sites to the multiple search engines without the need to register and verify your site with them. Once installed, the plugin will automatically generate and host the API key on your site. It detects page creation/update/ deletion in WordPress and automatically submits the URLs in the background. This ensures that search engines will always have the latest updates about your site. This plugin submits URLs to a generic end point `https://api.indexnow.org/indexnow` and these URLs are shared to all participating search engines.
 
-The plugin automatically respects noindex directives to prevent submission of URLs that should not be indexed, including WordPress site-wide search engine visibility settings, SEO plugin noindex settings (Yoast, RankMath, All in One SEO), and X-Robots-Tag headers.
+The plugin automatically respects noindex directives to prevent submission of URLs that should not be indexed. It checks the actual rendered HTML for `<meta name="robots" content="noindex">` tags, which works with any SEO plugin. It also checks X-Robots-Tag HTTP headers and WordPress site-wide search engine visibility settings.
 
 Some other handy features included in the plugin:
 
 * Toggle the automatic submission feature.
+* Exclude specific URL paths from auto-submission using wildcard patterns.
 * Manually submit a URL to IndexNow.
 * View list of recent URL submissions from the plugin.
 * Retry any failed submissions from the recent submissions list.
@@ -63,18 +64,18 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 
 == Changelog ==
 
+= 1.0.4 =
+* Universal noindex detection by parsing actual HTML meta robots tags (works with any SEO plugin).
+* Add excluded paths feature to prevent submission of specific URL patterns.
+* Support for wildcard patterns in excluded paths (e.g., /private/*, /draft-*).
+* Support for X-Robots-Tag HTTP headers.
+* Support for WordPress site-wide search engine visibility settings.
+* Improved logging for debugging.
+
 = 1.0.3 =
 * Fix for resubmit button not working.
 
 = 1.0.2 =
-* Add noindex directive detection to prevent submission of URLs that should not be indexed.
-* Support for WordPress site-wide search engine visibility settings.
-* Support for popular SEO plugins (Yoast, RankMath, All in One SEO) noindex meta tags.
-* Support for X-Robots-Tag HTTP headers.
-* Improved logging for debugging noindex detection.
-* Allow plugin owners of WordPress site to access Indexing Insights in Bing Webmaster tools.
-
-= 1.0.1 =
 * Allow plugin owners of WordPress site to access Indexing Insights in Bing Webmaster tools.
 
 = 1.0.1 =

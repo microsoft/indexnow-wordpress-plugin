@@ -5,6 +5,8 @@ IndexNow Plugin for WordPress enables automated submission of URLs from WordPres
 Some other handy features included in the plugin:
 
 - Toggle the automatic submission feature.
+- Exclude specific URL paths from auto-submission using wildcard patterns.
+- Automatic noindex detection (works with any SEO plugin).
 - Manually submit a URL to IndexNow.
 - View list of recent URL submissions from the plugin.
 - Retry any failed submissions from the recent submissions list.
@@ -40,6 +42,15 @@ We are providing a limited number of URLs submitted on the WordPress dashboard (
 - I can’t see the URLs in search engines indexed?
 
 Indexing of URLs is specific and dependent on each search engine’s rules, please reach out to individual search engine for debugging and resolution.
+
+### 1.0.4
+
+- Universal noindex detection by parsing actual HTML meta robots tags (works with any SEO plugin).
+- Add excluded paths feature to prevent submission of specific URL patterns.
+- Support for wildcard patterns in excluded paths (e.g., /private/*, /draft-*).
+- Support for X-Robots-Tag HTTP headers.
+- Support for WordPress site-wide search engine visibility settings.
+- Improved logging for debugging.
 
 ### 1.0.3
 

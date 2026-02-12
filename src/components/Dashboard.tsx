@@ -12,7 +12,8 @@ import {
   SubmitUrl,
   UpdateAutoSubmissionsEnabled,
   GetApiKey,
-  GetIndexNowInsightsUrl
+  GetIndexNowInsightsUrl,
+  UpdateExcludedPaths
 } from "./withDashboardData";
 import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
 import {
@@ -21,6 +22,7 @@ import {
   IChoiceGroupOption,
   ChoiceGroup,
   TextField,
+  IconButton,
 } from "@fluentui/react/lib/index";
 import { format, formatISO } from "date-fns";
 import {
@@ -44,6 +46,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     UpdateApiKeyModal = 1,
     EditPrefAutoSubmissionModal = 2,
     SubmitUrlModal = 3,
+    EditExcludedPathsModal = 4,
   }
 
   const [apiKeyInvalid, setApiKeyInvalid] = useState<boolean>(false);
@@ -76,6 +79,14 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     string
   >("");
   const [textFieldValueApiKey, setTextFieldValueApiKey] = useState<string>("");
+  const [textFieldValueExcludedPaths, setTextFieldValueExcludedPaths] = useState<string>("");
+  
+  // Excluded paths management state
+  const [excludedPathsList, setExcludedPathsList] = useState<string[]>([]);
+  const [newPathValue, setNewPathValue] = useState<string>("");
+  const [editingPathIndex, setEditingPathIndex] = useState<number | null>(null);
+  const [editingPathValue, setEditingPathValue] = useState<string>("");
+  const MAX_EXCLUDED_PATHS = 20;
 
   useEffect(() => {
     const data = Promise.resolve(GetApiKey());
@@ -98,6 +109,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         setSelectedOptionAutoSubmissions(
           response.data.AutoSubmissionEnabled ? "enable" : "disable"
         );
+        setTextFieldValueExcludedPaths(response.data.ExcludedPaths || "");
+        // Parse excluded paths into array
+        const paths = (response.data.ExcludedPaths || "")
+          .split('\n')
+          .map((p: string) => p.trim())
+          .filter((p: string) => p.length > 0);
+        setExcludedPathsList(paths);
       }
     });
   }, [apiKeyUpdated, apiSettingsUpdated]);
@@ -250,6 +268,76 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     });
   };
 
+  // Save excluded paths list to server
+  const saveExcludedPaths = (paths: string[]) => {
+    const pathsString = paths.join('\n');
+    Promise.resolve(UpdateExcludedPaths(pathsString)).then((response) => {
+      if (response && response.data) {
+        setApiSettingsUpdated(apiSettingsUpdated + 1);
+        if (response.data.error_type.length === 0) {
+          props.addBanner("Success : Excluded paths updated successfully.");
+        } else {
+          props.addBanner("Error : Excluded paths could not be updated.");
+        }
+      }
+    });
+  };
+
+  // Add a new excluded path
+  const addExcludedPath = () => {
+    const trimmedPath = newPathValue.trim();
+    if (trimmedPath && !excludedPathsList.includes(trimmedPath)) {
+      if (excludedPathsList.length >= MAX_EXCLUDED_PATHS) {
+        props.addBanner(`Error : Maximum of ${MAX_EXCLUDED_PATHS} excluded paths allowed.`);
+        return;
+      }
+      const newList = [...excludedPathsList, trimmedPath];
+      setExcludedPathsList(newList);
+      setNewPathValue("");
+      saveExcludedPaths(newList);
+    }
+  };
+
+  // Delete an excluded path
+  const deleteExcludedPath = (index: number) => {
+    const newList = excludedPathsList.filter((_, i) => i !== index);
+    setExcludedPathsList(newList);
+    saveExcludedPaths(newList);
+  };
+
+  // Start editing a path
+  const startEditingPath = (index: number) => {
+    setEditingPathIndex(index);
+    setEditingPathValue(excludedPathsList[index]);
+  };
+
+  // Save edited path
+  const saveEditedPath = () => {
+    if (editingPathIndex !== null) {
+      const trimmedPath = editingPathValue.trim();
+      if (trimmedPath) {
+        const newList = [...excludedPathsList];
+        newList[editingPathIndex] = trimmedPath;
+        setExcludedPathsList(newList);
+        saveExcludedPaths(newList);
+      }
+      setEditingPathIndex(null);
+      setEditingPathValue("");
+    }
+  };
+
+  // Cancel editing
+  const cancelEditingPath = () => {
+    setEditingPathIndex(null);
+    setEditingPathValue("");
+  };
+
+  const onClickUpdateExcludedPaths = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    setModalState(DashboardModalState.Hidden);
+  };
+
   const onClickModalSubmitUrl = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
@@ -302,15 +390,43 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <h2 className="sectionTitle">IndexNow Insights in Bing Webmaster tools</h2>
         </div>
         <div className="indexnow-CardRow">
-             <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-UrlSubmissions">
-                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIconName="Send" title="Indexnow Insights">
+             <div className="indexnow-CardColumn indexnow-CardColumn-2">
+                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIconName="Send" title="IndexNow Insights">
                     <p className="cardDescription">
-                              IndexNow Insights feature in Bing Webmaster tools can be used to monitor the indexing status and performance of the URLs submitted via IndexNow on Bing.
+                        Monitor indexing status and performance of URLs submitted via IndexNow in Bing Webmaster tools.
                     </p>
-                          <p style={{ marginLeft: "25px" }} >
-                        <DefaultButton onClick={viewInsightsOnClick} className="button submitButton" text="View Indexing Insights" />
-                    </p>
-                  </Card>
+                    <DefaultButton 
+                        onClick={viewInsightsOnClick} 
+                        style={{marginLeft: "26px"}}
+                        className="button submitButton" 
+                        text="View Insights" 
+                    />
+                </Card>
+             </div>
+             <div className="indexnow-CardColumn indexnow-CardColumn-2">
+                <Card
+                  title="Excluded Paths"
+                  className={apiKeyInvalid ? "indexnow-Disabled" : ""}
+                  tooltip="Configure URL paths that should be excluded from automatic IndexNow submissions"
+                  leadingIconName="BlockedSite"
+                >
+                  <p className="cardDescription">
+                    {excludedPathsList.length > 0
+                      ? `${excludedPathsList.length} path pattern(s) excluded from auto-submission`
+                      : "No paths excluded from auto-submission"}
+                  </p>
+                  <DefaultButton
+                    disabled={apiKeyInvalid}
+                    onClick={() => {
+                      setEditingPathIndex(null);
+                      setNewPathValue("");
+                      setModalState(DashboardModalState.EditExcludedPathsModal);
+                    }}
+                    style={{marginLeft: "26px"}}
+                    className="button submitButton"
+                    text="Manage Paths"
+                  />
+                </Card>
              </div>
         </div>
         <div className="indexnow-CardRow">
@@ -395,7 +511,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             </div>
           </div>
         </div>
-
 
         <div className="indexnow-CardRow">
           <div className="indexnow-OverviewSection">
@@ -620,6 +735,131 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                 text="Cancel"
                 onClick={() => {
                   setModalState(DashboardModalState.Hidden);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {modalState === DashboardModalState.EditExcludedPathsModal && (
+          <div className="modalContainer indexnow-ModalExcludedPaths">
+            <div className="modalHeader">
+              <p className="modalTitle">Manage Excluded Paths</p>
+              <Icon
+                iconName="ChromeClose"
+                className="indexnow-Icon modalClose"
+                onClick={() => {
+                  setModalState(DashboardModalState.Hidden);
+                  setEditingPathIndex(null);
+                  setNewPathValue("");
+                }}
+              />
+            </div>
+            <div className="modalContent">
+              <p className="modalDescription">
+                URL paths matching these patterns will be excluded from automatic IndexNow submissions.
+                Wildcards supported: <code>*</code> (any characters), <code>?</code> (single character)
+              </p>
+              <p className="modalDescription" style={{marginBottom: "15px", color: "#666"}}>
+                Examples: <code>/private/*</code>, <code>/draft-*</code>, <code>/internal/page</code>
+              </p>
+
+              {/* Add new path */}
+              <div style={{display: "flex", gap: "10px", marginBottom: "15px"}}>
+                <TextField
+                  placeholder="Enter path pattern (e.g., /private/*)"
+                  style={{flex: 1}}
+                  value={newPathValue}
+                  disabled={excludedPathsList.length >= MAX_EXCLUDED_PATHS}
+                  onChange={(event, val) => setNewPathValue(val || "")}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      addExcludedPath();
+                    }
+                  }}
+                />
+                <PrimaryButton
+                  text="Add"
+                  disabled={!newPathValue.trim() || excludedPathsList.length >= MAX_EXCLUDED_PATHS}
+                  onClick={addExcludedPath}
+                />
+              </div>
+
+              <p style={{fontSize: "12px", color: "#666", marginBottom: "10px"}}>
+                {excludedPathsList.length} / {MAX_EXCLUDED_PATHS} paths configured
+              </p>
+
+              {/* List of excluded paths */}
+              <div style={{maxHeight: "300px", overflowY: "auto", border: "1px solid #edebe9", borderRadius: "4px"}}>
+                {excludedPathsList.length === 0 ? (
+                  <p style={{padding: "20px", textAlign: "center", color: "#666"}}>
+                    No excluded paths configured. Add a path pattern above.
+                  </p>
+                ) : (
+                  excludedPathsList.map((path, index) => (
+                    <div 
+                      key={index} 
+                      style={{
+                        display: "flex", 
+                        alignItems: "center", 
+                        padding: "8px 12px",
+                        borderBottom: index < excludedPathsList.length - 1 ? "1px solid #edebe9" : "none",
+                        backgroundColor: index % 2 === 0 ? "#faf9f8" : "#fff"
+                      }}
+                    >
+                      {editingPathIndex === index ? (
+                        <>
+                          <TextField
+                            value={editingPathValue}
+                            style={{flex: 1, marginRight: "10px"}}
+                            onChange={(event, val) => setEditingPathValue(val || "")}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                saveEditedPath();
+                              }
+                            }}
+                          />
+                          <IconButton
+                            iconProps={{iconName: "CheckMark"}}
+                            title="Save"
+                            onClick={saveEditedPath}
+                            style={{color: "#107c10"}}
+                          />
+                          <IconButton
+                            iconProps={{iconName: "Cancel"}}
+                            title="Cancel"
+                            onClick={cancelEditingPath}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <code style={{flex: 1, fontSize: "13px"}}>{path}</code>
+                          <IconButton
+                            iconProps={{iconName: "Edit"}}
+                            title="Edit path"
+                            onClick={() => startEditingPath(index)}
+                          />
+                          <IconButton
+                            iconProps={{iconName: "Delete"}}
+                            title="Delete path"
+                            onClick={() => deleteExcludedPath(index)}
+                            style={{color: "#a80000"}}
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="modalFooter">
+              <DefaultButton
+                className="button secondaryButton"
+                text="Close"
+                onClick={() => {
+                  setModalState(DashboardModalState.Hidden);
+                  setEditingPathIndex(null);
+                  setNewPathValue("");
                 }}
               />
             </div>

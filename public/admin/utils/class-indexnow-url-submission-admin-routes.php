@@ -139,6 +139,23 @@ class BWT_IndexNow_Admin_Routes {
                 'permission_callback'   => array( $this, 'admin_permissions_check' ),
             ),
 		) );
+
+		$endpoint = '/excludedPaths/';
+		register_rest_route( $namespace, $endpoint, array(
+            array(
+                'methods'               => \WP_REST_Server::READABLE,
+                'callback'              => array( $this, 'get_excluded_paths' ),
+                'permission_callback'   => array( $this, 'admin_permissions_check' ),
+            ),
+		) );
+
+		register_rest_route( $namespace, $endpoint, array(
+            array(
+                'methods'               => \WP_REST_Server::EDITABLE,
+                'callback'              => array( $this, 'update_excluded_paths' ),
+                'permission_callback'   => array( $this, 'admin_permissions_check' ),
+            ),
+		) );
     }
 
 	public function admin_permissions_check( $request ) {
@@ -159,6 +176,14 @@ class BWT_IndexNow_Admin_Routes {
 
 	public function update_auto_submit( $request ) {
 		return $this->try_catch(array($request, array($this, 'call_update_auto_submit')), array($this, 'validate_api_key'));
+	}
+
+	public function get_excluded_paths( $request ) {
+		return $this->try_catch(array($request, array($this, 'call_get_excluded_paths')), array($this, 'validate_api_key'));
+	}
+
+	public function update_excluded_paths( $request ) {
+		return $this->try_catch(array($request, array($this, 'call_update_excluded_paths')), array($this, 'validate_api_key'));
 	}
 
 	/**
@@ -453,9 +478,11 @@ class BWT_IndexNow_Admin_Routes {
 			update_option( $this->prefix . 'auto_submission_enabled', "1" );
 			$auto_submission_enabled = "1";
 		}
+		$excluded_paths = get_option( $this->prefix . 'excluded_paths', '' );
 		$siteUrl = get_home_url();
 		return new \WP_REST_Response( array(
 			'AutoSubmissionEnabled' => $auto_submission_enabled === "1",
+			'ExcludedPaths' => $excluded_paths,
 			'SiteUrl' => $siteUrl,
 			'error_type' => WP_IN_Errors::NoError
 			), 200 );
@@ -470,6 +497,44 @@ class BWT_IndexNow_Admin_Routes {
 				return new \WP_REST_Response( array(
 					'error_type' => WP_IN_Errors::NoError
 					), 200 );
+			}
+		}
+
+		return new \WP_REST_Response( array(
+			'error_type' => WP_IN_Errors::InvalidRequest
+		), 200 );
+	}
+
+	private function call_get_excluded_paths( $request, $admin_api_key ) {
+		$excluded_paths = get_option( $this->prefix . 'excluded_paths', '' );
+		return new \WP_REST_Response( array(
+			'ExcludedPaths' => $excluded_paths,
+			'error_type' => WP_IN_Errors::NoError
+		), 200 );
+	}
+
+	private function call_update_excluded_paths( $request, $admin_api_key ) {
+		$max_excluded_paths = 20; // Maximum number of excluded paths allowed
+		$body = $request->get_body();
+		if (isset($body)) {
+			$json = json_decode($body);
+			if (isset($json->ExcludedPaths)) {
+				// Sanitize each line of the excluded paths
+				$paths = sanitize_textarea_field($json->ExcludedPaths);
+				
+				// Enforce maximum limit
+				$path_lines = array_filter(array_map('trim', explode("\n", $paths)));
+				if (count($path_lines) > $max_excluded_paths) {
+					return new \WP_REST_Response( array(
+						'error_type' => 'MaxPathsExceeded',
+						'error_message' => "Maximum of {$max_excluded_paths} excluded paths allowed."
+					), 200 );
+				}
+				
+				update_option( $this->prefix . 'excluded_paths', $paths );
+				return new \WP_REST_Response( array(
+					'error_type' => WP_IN_Errors::NoError
+				), 200 );
 			}
 		}
 

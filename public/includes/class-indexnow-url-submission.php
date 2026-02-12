@@ -56,7 +56,7 @@ class BWT_IndexNow {
 			$this->version = BWT_INDEXNOW_PLUGIN_VERSION;
 		} else {
 
-			$this->version = '1.0.3';
+			$this->version = '1.0.4';
 
 		}
 		$this->plugin_name = $plugin_name;
