@@ -758,10 +758,12 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <div className="modalContent">
               <p className="modalDescription">
                 URL paths matching these patterns will be excluded from automatic IndexNow submissions.
-                Wildcards supported: <code>*</code> (any characters), <code>?</code> (single character)
+              </p>
+              <p className="modalDescription">
+                Wildcards supported: <code>*</code> (any characters), <code>?</code> (single character).
               </p>
               <p className="modalDescription" style={{marginBottom: "15px", color: "#666"}}>
-                Examples: <code>/private/*</code>, <code>/draft-*</code>, <code>/internal/page</code>
+                Examples: <code>/private/*</code>, <code>/draft-*</code>, <code>/internal/page</code>.
               </p>
 
               {/* Add new path */}
