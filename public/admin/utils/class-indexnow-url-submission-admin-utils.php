@@ -118,6 +118,18 @@ class BWT_IndexNow_Admin_Utils {
 		update_option( 'indexnow-admin_api_key', base64_encode( $api_key ) );
 		update_option( 'indexnow-is_valid_api_key', '1' );
 	}
+
+	/**
+	 * Get the capability name required to access the admin page.
+	 */
+	public static function get_admin_capability() {
+		/**
+		 * Filters the IndexNow admin capability.
+		 *
+		 * @param string $capability Capability slug.
+		 */
+		return apply_filters( 'indexnow_admin_capability', 'manage_options' );
+	}
 }
 
 class IndexNowSubmissionCount {
