@@ -1,19 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import { App } from './components/App';
 import * as serviceWorker from './serviceWorker';
-import { initializeIcons } from "@fluentui/react/lib/Icons";
+import { initializeIcons } from "@fluentui/react";
 
 initializeIcons();
 
 var rootElement = document.getElementById("indexNowAppRoot");
 if (rootElement !== null) {
-  ReactDOM.render(
+  const root = createRoot(rootElement);
+  root.render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>,
-    rootElement
+    </React.StrictMode>
   );
 }
 

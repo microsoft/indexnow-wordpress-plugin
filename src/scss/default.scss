@@ -1,5 +1,5 @@
 ﻿// Combination of all variables, mixins and utilities
 
 // Variables
-@import "variables";
-@import "mixin";
+@forward "variables";
+@forward "mixin";

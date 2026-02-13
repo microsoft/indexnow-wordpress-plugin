@@ -2,8 +2,8 @@ import "../scss/Dashboard.scss";
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { DefaultButton, PrimaryButton } from "@fluentui/react";
+import { Icon } from "@fluentui/react";
 import {
   GetApiSettings,
   GetStats,
@@ -15,7 +15,7 @@ import {
   GetIndexNowInsightsUrl,
   UpdateExcludedPaths
 } from "./withDashboardData";
-import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
+import { ShimmeredDetailsList } from "@fluentui/react";
 import {
   IColumn,
   SelectionMode,
@@ -23,7 +23,7 @@ import {
   ChoiceGroup,
   TextField,
   IconButton,
-} from "@fluentui/react/lib/index";
+} from "@fluentui/react";
 import { format, formatISO } from "date-fns";
 import {
   IGetStatsResponse,
@@ -153,7 +153,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
       fieldName: "url",
       onRender: (item: UrlSubmission): JSX.Element => {
         return (
-          <a href={item.url} target="_blank">
+          <a href={item.url} target="_blank" rel="noreferrer">
             {decodeURI(item.url)}
           </a>
         );
@@ -593,7 +593,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </p>
           <p>
             Learn more about {" "}
-            <a href={StringConstants.IndexNowLink} target="_blank">IndexNow!</a>
+            <a href={StringConstants.IndexNowLink} target="_blank" rel="noreferrer">IndexNow!</a>
           </p>
         </div>
       </div>

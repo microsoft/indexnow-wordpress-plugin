@@ -5,12 +5,12 @@ import "../scss/App.scss";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { GetApiKey } from "./withDashboardData";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/components/Spinner";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 
 import { Header } from "./Header";
 import { StartPage } from "./StartPage";
 import { Dashboard } from "./Dashboard";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { Icon } from "@fluentui/react";
 
 export const App: React.FunctionComponent = () => {
   const [hasAPIKey, setHasAPIKey] = useState(false);
@@ -50,6 +50,7 @@ export const App: React.FunctionComponent = () => {
         {bannerList.map((bannerItem, index) => {
           return (
             <div
+              key={index}
               className={
                 "indexnow-Banner" +
                 (bannerItem.length <= 0 ? " indexnow-BannerHidden" : "") +

@@ -3,16 +3,16 @@
 // Used in conjunction with global variables to enable certain theme features.
 
 // Utilities
-@import "mixins/fonts";
-@import "mixins/border-radius";
-@import "mixins/textellipsis";
-@import "mixins/disabletext";
-@import "mixins/icons";
-@import "mixins/display";
-@import "mixins/clearfix";
+@forward "mixins/fonts";
+@forward "mixins/border-radius";
+@forward "mixins/textellipsis";
+@forward "mixins/disabletext";
+@forward "mixins/icons";
+@forward "mixins/display";
+@forward "mixins/clearfix";
 
 // Skins
-@import "mixins/opacity";
-@import "mixins/shadow";
-@import "mixins/transform";
-@import "mixins/transition";
+@forward "mixins/opacity";
+@forward "mixins/shadow";
+@forward "mixins/transform";
+@forward "mixins/transition";

@@ -1,4 +1,4 @@
-@import "./default";
+@use "default" as *;
 
 .rightHeaderPanel {
   margin: 24px -16px;

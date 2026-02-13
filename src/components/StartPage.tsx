@@ -2,8 +2,8 @@ import "../scss/StartPage.scss";
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { PrimaryButton } from "@fluentui/react/lib/Button";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { PrimaryButton } from "@fluentui/react";
+import { Icon } from "@fluentui/react";
 import { SetApiKey } from "./withDashboardData";
 import { ApiKeyRegex, StringConstants } from "../Constants";
 import { GetApiKey } from "./withDashboardData";

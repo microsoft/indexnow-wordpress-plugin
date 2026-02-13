@@ -1,7 +1,7 @@
 import React from "react";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { Icon } from "@fluentui/react";
 import { TooltipHost, ITooltipProps } from "@fluentui/react";
-import { useId } from "@uifabric/react-hooks/lib/useId";
+import { useId } from "@fluentui/react-hooks";
 
 export interface ICardProps {
   title: string;
@@ -10,7 +10,7 @@ export interface ICardProps {
   className?: string;
 }
 
-export const Card: React.FunctionComponent<ICardProps> = (props) => {
+export const Card: React.FunctionComponent<React.PropsWithChildren<ICardProps>> = (props) => {
   const tooltipId = useId(props.title);
 
   const tooltipProps: ITooltipProps = {

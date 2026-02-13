@@ -1,5 +1,5 @@
 import "../scss/Header.scss";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { Icon } from "@fluentui/react";
 import { StringConstants } from "../Constants";
 
 import * as React from "react";
