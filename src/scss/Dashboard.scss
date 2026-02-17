@@ -177,21 +177,117 @@
         width: 100%;
       }
 
-      .ms-DetailsHeader {
-        padding-top: 0;
-      }
+      .indexnow-SubmissionsTable {
+        border-radius: 12px;
+        table-layout: fixed;
+        width: 100%;
 
-      .ms-DetailsRow-cell {
-        color: $bwt_cardTextColor;
-      }
+        .col-url {
+          width: 60%;
 
-      i.retryIcon {
-        cursor: pointer;
+          a {
+            word-break: break-all;
+            color: $bwt_primaryTealColor;
+            text-decoration: none;
 
-        &:hover {
-          color: $bwt_primaryTealColor;
-          font-weight: bolder;
-          font-size: 16px;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+
+        .col-date {
+          width: 18%;
+          white-space: nowrap;
+        }
+
+        .col-status {
+          width: 15%;
+          white-space: nowrap;
+        }
+
+        .col-action {
+          width: 7%;
+          text-align: center;
+        }
+
+        // Tablet — let date wrap if needed
+        @media (max-width: 960px) {
+          .col-url {
+            width: 50%;
+          }
+
+          .col-date {
+            width: 22%;
+            white-space: normal;
+          }
+
+          .col-status {
+            width: 18%;
+            white-space: normal;
+          }
+
+          .col-action {
+            width: 10%;
+          }
+        }
+
+        // Mobile — stack cells vertically
+        @media (max-width: 782px) {
+          table-layout: auto;
+
+          // Hide header row on mobile
+          thead {
+            display: none;
+          }
+
+          tbody tr {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            border-bottom: 1px solid #edebe9;
+            gap: 4px;
+
+            // URL takes full width
+            .col-url {
+              width: 100%;
+              font-size: 14px;
+              font-weight: 500;
+
+              a {
+                word-break: break-all;
+              }
+            }
+
+            // Date and status share a row
+            .col-date,
+            .col-status {
+              width: auto;
+              white-space: normal;
+              font-size: 13px;
+              color: #6b6b6b;
+
+              &::before {
+                font-weight: 600;
+                margin-right: 4px;
+              }
+            }
+
+            .col-date::before {
+              content: "Submitted: ";
+            }
+
+            .col-status::before {
+              content: "Status: ";
+            }
+
+            // Resubmit button aligned right
+            .col-action {
+              width: auto;
+              margin-left: auto;
+              text-align: right;
+            }
+          }
         }
       }
     }
@@ -209,7 +305,7 @@
   width: 40%;
   top: 30%;
   left: 30%;
-  z-index: 1;
+  z-index: 2;
   box-shadow: -3px 6px 16px #00000029;
   border-radius: 12px;
 
@@ -297,4 +393,11 @@
 
 .darken {
   filter: opacity(0.5);
+  pointer-events: none;
+}
+
+.indexnow-ModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
 }

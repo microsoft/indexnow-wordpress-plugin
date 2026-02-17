@@ -5,12 +5,12 @@ import "../scss/App.scss";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { GetApiKey } from "./withDashboardData";
-import { Spinner, SpinnerSize } from "@fluentui/react";
+import { Spinner, Button } from "@fluentui/react-components";
 
 import { Header } from "./Header";
 import { StartPage } from "./StartPage";
 import { Dashboard } from "./Dashboard";
-import { Icon } from "@fluentui/react";
+import { Dismiss24Regular } from "@fluentui/react-icons";
 
 export const App: React.FunctionComponent = () => {
   const [hasAPIKey, setHasAPIKey] = useState(false);
@@ -24,7 +24,22 @@ export const App: React.FunctionComponent = () => {
       setShowLoading(false);
       if (response && response.data) {
         setHasAPIKey(response.data.hasAPIKey);
+      } else if (response && response.error) {
+        setBannerList([
+          `Error : Failed to load API key — ${response.error.message || response.error.code || "Unknown error"}`
+        ]);
+      } else if (response && !response.ok) {
+        setBannerList([
+          `Error : Failed to load API key (HTTP ${response.status}). Please refresh the page or check your server.`
+        ]);
       }
+    }).catch((err) => {
+      setShowLoading(false);
+      const message =
+        err instanceof TypeError
+          ? "Could not connect to the server. Please check your network and try again."
+          : (err?.message || "An unexpected error occurred.");
+      setBannerList([`Error : Failed to load API key — ${message}`]);
     });
   }, []);
 
@@ -51,6 +66,7 @@ export const App: React.FunctionComponent = () => {
           return (
             <div
               key={index}
+              role="alert"
               className={
                 "indexnow-Banner" +
                 (bannerItem.length <= 0 ? " indexnow-BannerHidden" : "") +
@@ -60,11 +76,14 @@ export const App: React.FunctionComponent = () => {
               }
             >
               <span>{bannerItem}</span>
-              <Icon
-                iconName="ChromeClose"
+              <Button
+                appearance="transparent"
+                icon={<Dismiss24Regular />}
                 className="closeIcon"
                 data-index={index}
                 onClick={closeBannerOnClick}
+                aria-label="Dismiss notification"
+                size="small"
               />
             </div>
           );
@@ -72,7 +91,7 @@ export const App: React.FunctionComponent = () => {
         {showLoading &&
           <div>
             <Spinner
-              size={SpinnerSize.large}
+              size="large"
               className="maskSpinner"
             />
           </div>}

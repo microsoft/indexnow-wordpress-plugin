@@ -1,41 +1,33 @@
 import React from "react";
-import { Icon } from "@fluentui/react";
-import { TooltipHost, ITooltipProps } from "@fluentui/react";
-import { useId } from "@fluentui/react-hooks";
+import { Tooltip } from "@fluentui/react-components";
+import { Info24Regular } from "@fluentui/react-icons";
 
 export interface ICardProps {
   title: string;
   tooltip: string;
-  leadingIconName: string;
+  leadingIcon: React.ComponentType<{ className?: string }>;
   className?: string;
 }
 
 export const Card: React.FunctionComponent<React.PropsWithChildren<ICardProps>> = (props) => {
-  const tooltipId = useId(props.title);
-
-  const tooltipProps: ITooltipProps = {
-    onRenderContent: () => <span>{props.tooltip}</span>,
-  };
+  const LeadingIcon = props.leadingIcon;
 
   return (
-    <div className={"indexnow-Card " + props.className || ""}>
+    <div className={"indexnow-Card " + (props.className || "")}>
       <div className="cardHeader">
         <span className="cardTitle">
-          <Icon iconName={props.leadingIconName} className="cardTitleIcon" />
+          <LeadingIcon className="cardTitleIcon" />
           <span>{props.title}</span>
 
-          <TooltipHost
-            closeDelay={500}
-            directionalHint={1}
-            id={tooltipId}
-            tooltipProps={tooltipProps}
+          <Tooltip
+            content={props.tooltip}
+            relationship="description"
+            positioning="above"
           >
-            <Icon
-              aria-describedby={tooltipId}
-              iconName="Info"
-              className="info"
-            />
-          </TooltipHost>
+            <span tabIndex={0} style={{ display: "inline-flex", cursor: "help" }}>
+              <Info24Regular className="info" />
+            </span>
+          </Tooltip>
         </span>
       </div>
       <div className="cardContent">

@@ -1,5 +1,11 @@
 @use "default" as *;
 
+// Keyboard-accessible focus indicator (zero-cost: only renders on keyboard nav)
+*:focus-visible {
+  outline: 2px solid $bwt_primaryTealColor;
+  outline-offset: 2px;
+}
+
 .indexnow-App {
   h2 {
     @include font-type($bwt_scopeFontFamily, $bwt_focusFontSize);

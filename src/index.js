@@ -3,16 +3,16 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { App } from './components/App';
 import * as serviceWorker from './serviceWorker';
-import { initializeIcons } from "@fluentui/react";
-
-initializeIcons();
+import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 
 var rootElement = document.getElementById("indexNowAppRoot");
 if (rootElement !== null) {
   const root = createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <App />
+      <FluentProvider theme={webLightTheme}>
+        <App />
+      </FluentProvider>
     </React.StrictMode>
   );
 }
