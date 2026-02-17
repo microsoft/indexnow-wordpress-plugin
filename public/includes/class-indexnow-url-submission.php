@@ -125,6 +125,10 @@ class BWT_IndexNow {
 
 		// Add url submit action & post publishing.
 		$this->loader->add_action( 'transition_post_status', $plugin_admin, 'on_post_published', 10, 3 );
+
+		// Register custom cron schedule interval and retry queue processor.
+		$this->loader->add_filter( 'cron_schedules', $plugin_admin, 'add_cron_intervals' );
+		$this->loader->add_action( 'indexnow_process_retry_queue', $plugin_admin, 'process_retry_queue' );
 	}
 
 	/**

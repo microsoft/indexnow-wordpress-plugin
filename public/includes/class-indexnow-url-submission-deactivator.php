@@ -25,17 +25,29 @@ class BWT_IndexNow_Deactivator {
 		delete_option( 'indexnow-is_valid_api_key' );
 		delete_option( 'indexnow-admin_api_key' );
 		delete_option( 'indexnow-auto_submission_enabled' );
+		delete_option( 'indexnow-excluded_paths' );
+
+		// Clear the retry queue cron event
+		$timestamp = wp_next_scheduled( 'indexnow_process_retry_queue' );
+		if ( $timestamp ) {
+			wp_unschedule_event( $timestamp, 'indexnow_process_retry_queue' );
+		}
 
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'indexnow_failed_submissions';
 		//phpcs:disable 
-		$wpdb->query( 'DROP TABLE  ' . $table_name );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $table_name );
 		//phpcs:enable 
 		$table_name = $wpdb->prefix . 'indexnow_passed_submissions';
 		//phpcs:disable
-		$wpdb->query( 'DROP TABLE  ' . $table_name );
-		//phpcs:enable 
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $table_name );
+		//phpcs:enable
+
+		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		//phpcs:disable
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $table_name );
+		//phpcs:enable
 	}
 
 }

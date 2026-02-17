@@ -34,6 +34,13 @@ class BWT_IndexNow_Admin_Routes {
 
 	public static $failed_submissions_table = "indexnow_failed_submissions";
 
+	public static $retry_queue_table = "indexnow_retry_queue";
+
+	/**
+	 * Maximum number of URLs allowed in a single IndexNow API urlList request.
+	 */
+	const URL_LIST_MAX_SIZE = 10000;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -278,56 +285,86 @@ class BWT_IndexNow_Admin_Routes {
 
 	public function submit_url_to_bwt($site_url, $url, $api_key, $type, $is_manual_submission)
 	{
+		return $this->submit_urls_batch_to_bwt( $site_url, array( $url ), $api_key, $type, $is_manual_submission );
+	}
+
+	/**
+	 * Submit a batch of URLs to IndexNow API.
+	 * The urlList is capped at URL_LIST_MAX_SIZE (10,000) URLs per request.
+	 *
+	 * @param string $site_url   The site URL.
+	 * @param array  $urls       Array of URLs to submit (max 10,000).
+	 * @param string $api_key    The API key.
+	 * @param string $type       The submission type (add/update/delete).
+	 * @param bool   $is_manual  Whether this is a manual submission.
+	 * @return string 'success' or 'error:...' string.
+	 */
+	public function submit_urls_batch_to_bwt($site_url, $urls, $api_key, $type, $is_manual_submission)
+	{
+		// Enforce the 10K URL list limit
+		if ( count( $urls ) > self::URL_LIST_MAX_SIZE ) {
+			$urls = array_slice( $urls, 0, self::URL_LIST_MAX_SIZE );
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' URL list truncated to ' . self::URL_LIST_MAX_SIZE . ' URLs' );
+			}
+		}
+
 		$data = json_encode(
 			array(
 				'host'         => $this->remove_scheme( $site_url ),
 				'key'          => $api_key,
 				'keyLocation'  => trailingslashit( $site_url ) . $api_key . '.txt',
-				 'urlList'     => array( $url ),
+				'urlList'      => array_values( $urls ),
 			)
 		);
 
-			$response = wp_remote_post(
-				'https://api.indexnow.org/indexnow/',
-				array(
-					'body'    => $data,
-					'headers' => array( 
-						'Content-Type'  => 'application/json',
-						'X-Source-Info' => 'https://wordpress.com/' . $this->version . '/' . $is_manual_submission
-					),
-				)
-			);
+		$response = wp_remote_post(
+			'https://api.indexnow.org/indexnow/',
+			array(
+				'body'    => $data,
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'X-Source-Info' => 'https://wordpress.com/' . $this->version . '/' . $is_manual_submission
+				),
+			)
+		);
 
-		if (is_wp_error( $response )) {
-			if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-			    error_log(__METHOD__ . " error:WP_Error: ".$response->get_error_message()) ;
+		if ( is_wp_error( $response ) ) {
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' error:WP_Error: ' . $response->get_error_message() );
 			}
-			return "error:WP_Error";
+			return 'error:WP_Error';
 		}
 		if ( isset( $response['errors'] ) ) {
 			return 'error:RequestFailed';
 		}
 		try {
-			if ( 200 === $response['response']['code'] || 202 === $response['response']['code'] ) {
+			$code = $response['response']['code'];
+			if ( 200 === $code || 202 === $code ) {
 				return 'success';
-			} else {
-				if ( 400 === $response['response']['code'] ) {
+			}
+			switch ( $code ) {
+				case 400:
 					return 'error:InvalidRequest';
-				} else 
-				 if ( 403 === $response['response']['code'] ) {
-					 return 'error:InvalidApiKey';
-				 } else 
-				 if ( 422 === $response['response']['code'] ) {
-					 return 'error:InvalidUrl';
-				 }else 
-				if ( 429 === $response['response']['code'] ) {
-					return 'error:UnknownError';
-				}else {
-					return 'error: ' . $response['response']['message'];
-					if ( true === WP_DEBUG && true === WP_DEBUG_LOG) {
-						error_log(__METHOD__ . " body : ". json_decode($response['body'])->message) ;
+				case 403:
+					return 'error:InvalidApiKey';
+				case 422:
+					return 'error:InvalidUrl';
+				case 429:
+					if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+						error_log( __METHOD__ . ' 429 Too Many Requests - rate limited by IndexNow API' );
 					}
-				}
+					return 'error:TooManyRequests';
+				default:
+					if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+						$body_msg = '';
+						if ( ! empty( $response['body'] ) ) {
+							$decoded = json_decode( $response['body'] );
+							$body_msg = isset( $decoded->message ) ? $decoded->message : $response['body'];
+						}
+						error_log( __METHOD__ . ' body: ' . $body_msg );
+					}
+					return 'error: ' . $response['response']['message'];
 			}
 		} catch ( \Throwable $th ) {
 			return 'error:RequestFailed';
@@ -697,6 +734,7 @@ class BWT_IndexNow_Admin_Routes {
 			case 'InvalidParameter' : return WP_IN_Errors::BWT_InvalidParameter;
 			case 'NotAllowed' : return WP_IN_Errors::BWT_NotAllowed;
 			case 'InvalidRequest' : return WP_IN_Errors::InvalidRequest;
+			case 'TooManyRequests' : return WP_IN_Errors::TooManyRequests;
 			default : return $this->get_custom_api_error($message);
 		}
 	}
@@ -765,5 +803,6 @@ class WP_IN_Errors {
 	const BWT_NotAllowed = "Not Allowed";
 	const BWT_NullException =  "Null Value Found";
 	const BWT_InvalidApiCall = "Invalid API Call";
+	const TooManyRequests = "Too Many Requests (429)";
 	const OtherError = "Unknown Error Occured";
 }

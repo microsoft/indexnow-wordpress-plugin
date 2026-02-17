@@ -327,7 +327,24 @@ class BWT_IndexNow_Admin {
 				}
 				$api_key = base64_decode($admin_api_key);
 				$output = $this->routes->submit_url_to_bwt($siteUrl, $link, $api_key, $type, false);
-				$this->routes->update_submission_output($output, $link);
+
+				if ( $output === 'success' ) {
+					$this->routes->update_submission_output( $output, $link );
+					return;
+				}
+
+				// Permanent client errors should not be retried
+				$non_retryable_errors = array( 'error:InvalidRequest', 'error:InvalidApiKey', 'error:InvalidUrl' );
+				if ( in_array( $output, $non_retryable_errors, true ) ) {
+					$this->routes->update_submission_output( $output, $link );
+					return;
+				}
+
+				// Transient/server errors: queue for retry with exponential backoff
+				if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+					error_log( __METHOD__ . ' Submission failed (' . $output . '), queueing URL for retry: ' . $link );
+				}
+				BWT_IndexNow_Admin_Utils::add_to_retry_queue( $link, $type, 60, 3 );
 			}
 		}
 	}
@@ -340,6 +357,104 @@ class BWT_IndexNow_Admin {
 	public function validate($input)
 	{
 		return $input;
+	}
+
+	/**
+	 * Register a custom "every_minute" cron interval for retry queue processing.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array Modified cron schedules.
+	 */
+	public function add_cron_intervals( $schedules ) {
+		if ( ! isset( $schedules['every_minute'] ) ) {
+			$schedules['every_minute'] = array(
+				'interval' => 60,
+				'display'  => __( 'Every Minute' ),
+			);
+		}
+		return $schedules;
+	}
+
+	/**
+	 * Process the retry queue: re-submit URLs that previously failed due to transient errors
+	 * (e.g., 429 rate limiting, network failures, server errors).
+	 * Called by the WP-Cron event 'indexnow_process_retry_queue'.
+	 *
+	 * Uses batch submission (up to 10K URLs per request) and exponential backoff.
+	 */
+	public function process_retry_queue() {
+		$admin_api_key = get_option( $this->prefix . 'admin_api_key' );
+		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
+
+		if ( ! $is_valid_api_key || $is_valid_api_key !== '1' || empty( $admin_api_key ) ) {
+			return;
+		}
+
+		$pending = BWT_IndexNow_Admin_Utils::get_pending_retries( BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+
+		if ( empty( $pending ) ) {
+			return;
+		}
+
+		$api_key = base64_decode( $admin_api_key );
+		$siteUrl = get_home_url();
+
+		// Group by type so we can batch URLs of the same type
+		$grouped = array();
+		foreach ( $pending as $item ) {
+			$grouped[ $item->type ][] = $item;
+		}
+
+		foreach ( $grouped as $type => $items ) {
+			// Batch URLs into chunks of URL_LIST_MAX_SIZE
+			$chunks = array_chunk( $items, BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+
+			foreach ( $chunks as $chunk ) {
+				$urls = array_map( function( $item ) {
+					return $item->url;
+				}, $chunk );
+
+				$output = $this->routes->submit_urls_batch_to_bwt( $siteUrl, $urls, $api_key, $type, false );
+
+				if ( $output === 'success' ) {
+					// Success: remove from queue, log as passed
+					foreach ( $chunk as $item ) {
+						BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+						$this->routes->update_submission_output( $output, $item->url );
+					}
+					if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+						error_log( __METHOD__ . ' Retry batch succeeded: ' . count( $chunk ) . ' URLs of type ' . $type );
+					}
+				} elseif ( $output === 'error:TooManyRequests' ) {
+					// Still rate-limited: increment retry count with exponential backoff
+					foreach ( $chunk as $item ) {
+						$new_count = (int) $item->retry_count + 1;
+						if ( $new_count >= (int) $item->max_retries ) {
+							// Max retries exceeded: move to failed submissions
+							BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+							$this->routes->update_submission_output( 'error:TooManyRequests', $item->url );
+							if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+								error_log( __METHOD__ . ' Max retries exceeded for: ' . $item->url );
+							}
+						} else {
+							BWT_IndexNow_Admin_Utils::update_retry_item( $item->id, $new_count, WP_IN_Errors::TooManyRequests );
+						}
+					}
+				} else {
+					// Other error: increment retry or fail permanently
+					foreach ( $chunk as $item ) {
+						$new_count = (int) $item->retry_count + 1;
+						if ( $new_count >= (int) $item->max_retries ) {
+							BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+							$this->routes->update_submission_output( $output, $item->url );
+						} else {
+							$error_msg = substr( $output, 0, 6 ) === 'error:' ? substr( $output, 6 ) : $output;
+							BWT_IndexNow_Admin_Utils::update_retry_item( $item->id, $new_count, $error_msg );
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**
