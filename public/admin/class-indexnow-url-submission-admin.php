@@ -161,8 +161,7 @@ class BWT_IndexNow_Admin {
 		// Fetch the page and check for noindex meta tag and X-Robots-Tag header
 		// Use a short timeout to avoid delays in post publishing
 		$response = wp_safe_remote_get($url, array(
-			'timeout' => 5,
-			'sslverify' => false, // Allow self-signed certs for local dev
+			'timeout' => 5
 		));
 
 		if (is_wp_error($response)) {
