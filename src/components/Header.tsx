@@ -1,5 +1,5 @@
 import "../scss/Header.scss";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { Info24Regular } from "@fluentui/react-icons";
 import { StringConstants } from "../Constants";
 
 import * as React from "react";
@@ -34,9 +34,12 @@ export const Header: React.FunctionComponent = () => {
               window.open(StringConstants.PluginInfoLink, "_blank")
             }
             key="headerHelp"
+            role="button"
+            tabIndex={0}
+            aria-label="About this plugin"
           >
             <span className="desktopOnly">About this plugin</span>
-            <Icon iconName="Info" className="bw-Icon" />
+            <Info24Regular aria-hidden="true" className="bw-Icon" />
           </span>
         </div>
       </header>

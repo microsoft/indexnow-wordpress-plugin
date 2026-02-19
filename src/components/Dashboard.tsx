@@ -1,9 +1,35 @@
 import "../scss/Dashboard.scss";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
-import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Button,
+  Input,
+  Field,
+  RadioGroup,
+  Radio,
+  Table,
+  TableHeader,
+  TableRow,
+  TableHeaderCell,
+  TableBody,
+  TableCell,
+  Skeleton,
+  SkeletonItem,
+} from "@fluentui/react-components";
+import {
+  Send24Regular,
+  Rocket24Regular,
+  TargetArrow24Regular,
+  ErrorCircle24Filled,
+  MoreVertical24Regular,
+  ArrowSync24Regular,
+  Dismiss24Regular,
+  Checkmark24Regular,
+  Edit24Regular,
+  Delete24Regular,
+  ShieldDismiss24Regular,
+} from "@fluentui/react-icons";
 import {
   GetApiSettings,
   GetStats,
@@ -12,16 +38,9 @@ import {
   SubmitUrl,
   UpdateAutoSubmissionsEnabled,
   GetApiKey,
-  GetIndexNowInsightsUrl
+  GetIndexNowInsightsUrl,
+  UpdateExcludedPaths
 } from "./withDashboardData";
-import { ShimmeredDetailsList } from "@fluentui/react/lib/ShimmeredDetailsList";
-import {
-  IColumn,
-  SelectionMode,
-  IChoiceGroupOption,
-  ChoiceGroup,
-  TextField,
-} from "@fluentui/react/lib/index";
 import { format, formatISO } from "date-fns";
 import {
   IGetStatsResponse,
@@ -44,6 +63,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     UpdateApiKeyModal = 1,
     EditPrefAutoSubmissionModal = 2,
     SubmitUrlModal = 3,
+    EditExcludedPathsModal = 4,
   }
 
   const [apiKeyInvalid, setApiKeyInvalid] = useState<boolean>(false);
@@ -76,6 +96,76 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     string
   >("");
   const [textFieldValueApiKey, setTextFieldValueApiKey] = useState<string>("");
+  const [textFieldValueExcludedPaths, setTextFieldValueExcludedPaths] = useState<string>("");
+  
+  // Excluded paths management state
+  const [excludedPathsList, setExcludedPathsList] = useState<string[]>([]);
+  const [newPathValue, setNewPathValue] = useState<string>("");
+  const [editingPathIndex, setEditingPathIndex] = useState<number | null>(null);
+  const [editingPathValue, setEditingPathValue] = useState<string>("");
+  const MAX_EXCLUDED_PATHS = 20;
+
+  // -- Accessibility: modal refs and helpers --
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  const openModal = useCallback((state: DashboardModalState) => {
+    triggerRef.current = document.activeElement as HTMLElement;
+    setModalState(state);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalState(DashboardModalState.Hidden);
+    setTimeout(() => triggerRef.current?.focus(), 0);
+  }, []);
+
+  // Focus trap + Escape key for modals (lightweight, no extra deps)
+  useEffect(() => {
+    if (modalState === DashboardModalState.Hidden) return;
+    const modalEl = modalRef.current;
+    if (!modalEl) return;
+
+    const focusableSelector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => modalEl.querySelectorAll<HTMLElement>(focusableSelector);
+
+    // Auto-focus first focusable element
+    requestAnimationFrame(() => {
+      const els = getFocusable();
+      if (els.length) els[0].focus();
+    });
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusable = getFocusable();
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [modalState, closeModal]);
+
+  // Close popover on outside click
+  useEffect(() => {
+    if (!showAutoSubmissionsPopOverMenu) return;
+    const close = () => setShowAutoSubmissionsPopOverMenu(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [showAutoSubmissionsPopOverMenu]);
 
   useEffect(() => {
     const data = Promise.resolve(GetApiKey());
@@ -98,6 +188,13 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         setSelectedOptionAutoSubmissions(
           response.data.AutoSubmissionEnabled ? "enable" : "disable"
         );
+        setTextFieldValueExcludedPaths(response.data.ExcludedPaths || "");
+        // Parse excluded paths into array
+        const paths = (response.data.ExcludedPaths || "")
+          .split('\n')
+          .map((p: string) => p.trim())
+          .filter((p: string) => p.length > 0);
+        setExcludedPathsList(paths);
       }
     });
   }, [apiKeyUpdated, apiSettingsUpdated]);
@@ -124,74 +221,16 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   }, [apiKeyUpdated, urlSubmitted]);
 
   // constants
-  const autoSubmissionOptions: IChoiceGroupOption[] = [
-    { key: "enable", text: "Enable (recommended)" },
-    { key: "disable", text: "Disable" },
-  ];
-  const urlSubmissionTableColumns: IColumn[] = [
-    {
-      key: "url",
-      name: "URL",
-      fieldName: "url",
-      onRender: (item: UrlSubmission): JSX.Element => {
-        return (
-          <a href={item.url} target="_blank">
-            {decodeURI(item.url)}
-          </a>
-        );
-      },
-      minWidth: 250,
-    },
-    {
-      key: "submittedOn",
-      name: "Submitted On",
-      fieldName: "submission_date",
-      onRender: (item: UrlSubmission): string => {
-        let time: Date = new Date(0);
-        time.setUTCSeconds(item.submission_date);
-        let dateString: string =
-          time.getFullYear === new Date().getFullYear
-            ? format(time, "d MMM 'at' HH':'mm", {})
-            : format(time, "d MMM yyyy'at' HH':'mm", {});
-        return dateString;
-      },
-      minWidth: 150,
-    },
-    {
-      key: "status",
-      name: "Status",
-      fieldName: "error",
-      onRender: (item: UrlSubmission): string => {
-        return item.error === "Success" ? item.error : `Failed - ${item.error}`;
-      },
-      minWidth: 200,
-    },
-    {
-      key: "resubmit",
-      name: "",
-      onRender: (item: UrlSubmission) => {
-        return (
-          <Icon
-            iconName="Sync"
-            data-submission={JSON.stringify(item)}
-            className="indexnow-Icon retryIcon"
-            onClick={resubmitOnClick}
-          />
-        );
-      },
-      minWidth: 40,
-      maxWidth: 70,
-      className: "retryColumn",
-    },
-  ];
+  const formatSubmissionDate = (timestamp: number): string => {
+    let time: Date = new Date(0);
+    time.setUTCSeconds(timestamp);
+    return time.getFullYear() === new Date().getFullYear()
+      ? format(time, "d MMM 'at' HH':'mm", {})
+      : format(time, "d MMM yyyy 'at' HH':'mm", {});
+  };
 
   // Function handler for URL submission retries
-  const resubmitOnClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    const submissionItemString: string =
-      (event.target as HTMLInputElement).dataset.submission ?? "";
-    const submissionItem: UrlSubmission = JSON.parse(submissionItemString);
+  const resubmitItem = (submissionItem: UrlSubmission) => {
     Promise.resolve(RetryFailedSubmissions([submissionItem])).then(
       (response) => {
         if (response && response.data) {
@@ -231,7 +270,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
   const onClickUpdateAutoSubmissions = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
-    setModalState(DashboardModalState.Hidden);
+    closeModal();
     Promise.resolve(
       UpdateAutoSubmissionsEnabled(selectedOptionAutoSubmissions === "enable")
     ).then((response) => {
@@ -250,11 +289,81 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
     });
   };
 
+  // Save excluded paths list to server
+  const saveExcludedPaths = (paths: string[]) => {
+    const pathsString = paths.join('\n');
+    Promise.resolve(UpdateExcludedPaths(pathsString)).then((response) => {
+      if (response && response.data) {
+        setApiSettingsUpdated(apiSettingsUpdated + 1);
+        if (response.data.error_type.length === 0) {
+          props.addBanner("Success : Excluded paths updated successfully.");
+        } else {
+          props.addBanner("Error : Excluded paths could not be updated.");
+        }
+      }
+    });
+  };
+
+  // Add a new excluded path
+  const addExcludedPath = () => {
+    const trimmedPath = newPathValue.trim();
+    if (trimmedPath && !excludedPathsList.includes(trimmedPath)) {
+      if (excludedPathsList.length >= MAX_EXCLUDED_PATHS) {
+        props.addBanner(`Error : Maximum of ${MAX_EXCLUDED_PATHS} excluded paths allowed.`);
+        return;
+      }
+      const newList = [...excludedPathsList, trimmedPath];
+      setExcludedPathsList(newList);
+      setNewPathValue("");
+      saveExcludedPaths(newList);
+    }
+  };
+
+  // Delete an excluded path
+  const deleteExcludedPath = (index: number) => {
+    const newList = excludedPathsList.filter((_, i) => i !== index);
+    setExcludedPathsList(newList);
+    saveExcludedPaths(newList);
+  };
+
+  // Start editing a path
+  const startEditingPath = (index: number) => {
+    setEditingPathIndex(index);
+    setEditingPathValue(excludedPathsList[index]);
+  };
+
+  // Save edited path
+  const saveEditedPath = () => {
+    if (editingPathIndex !== null) {
+      const trimmedPath = editingPathValue.trim();
+      if (trimmedPath) {
+        const newList = [...excludedPathsList];
+        newList[editingPathIndex] = trimmedPath;
+        setExcludedPathsList(newList);
+        saveExcludedPaths(newList);
+      }
+      setEditingPathIndex(null);
+      setEditingPathValue("");
+    }
+  };
+
+  // Cancel editing
+  const cancelEditingPath = () => {
+    setEditingPathIndex(null);
+    setEditingPathValue("");
+  };
+
+  const onClickUpdateExcludedPaths = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    closeModal();
+  };
+
   const onClickModalSubmitUrl = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     // hide modal and submit Url
-    setModalState(DashboardModalState.Hidden);
+    closeModal();
     Promise.resolve(SubmitUrl(textFieldValueUrlSubmit)).then((response) => {
       if (response && response.data) {
         setUrlSubmitted(urlSubmitted + 1);
@@ -302,15 +411,45 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <h2 className="sectionTitle">IndexNow Insights in Bing Webmaster tools</h2>
         </div>
         <div className="indexnow-CardRow">
-             <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-UrlSubmissions">
-                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIconName="Send" title="Indexnow Insights">
+             <div className="indexnow-CardColumn indexnow-CardColumn-2">
+                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIcon={Send24Regular} title="IndexNow Insights">
                     <p className="cardDescription">
-                              IndexNow Insights feature in Bing Webmaster tools can be used to monitor the indexing status and performance of the URLs submitted via IndexNow on Bing.
+                        Monitor indexing status and performance of URLs submitted via IndexNow in Bing Webmaster tools.
                     </p>
-                          <p style={{ marginLeft: "25px" }} >
-                        <DefaultButton onClick={viewInsightsOnClick} className="button submitButton" text="View Indexing Insights" />
-                    </p>
-                  </Card>
+                    <Button 
+                        onClick={viewInsightsOnClick} 
+                        style={{marginLeft: "26px"}}
+                        className="button submitButton"
+                    >
+                        View Insights
+                    </Button>
+                </Card>
+             </div>
+             <div className="indexnow-CardColumn indexnow-CardColumn-2">
+                <Card
+                  title="Excluded Paths"
+                  className={apiKeyInvalid ? "indexnow-Disabled" : ""}
+                  tooltip="Configure URL paths that should be excluded from automatic IndexNow submissions"
+                  leadingIcon={ShieldDismiss24Regular}
+                >
+                  <p className="cardDescription">
+                    {excludedPathsList.length > 0
+                      ? `${excludedPathsList.length} path pattern(s) excluded from auto-submission`
+                      : "No paths excluded from auto-submission"}
+                  </p>
+                  <Button
+                    disabled={apiKeyInvalid}
+                    onClick={() => {
+                      setEditingPathIndex(null);
+                      setNewPathValue("");
+                      openModal(DashboardModalState.EditExcludedPathsModal);
+                    }}
+                    style={{marginLeft: "26px"}}
+                    className="button submitButton"
+                  >
+                    Manage Paths
+                  </Button>
+                </Card>
              </div>
         </div>
         <div className="indexnow-CardRow">
@@ -318,23 +457,24 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <Card
               title="Manual URL submission"
               tooltip="This feature allows you to submit a URL directly to IndexNow supporting search engines."
-              leadingIconName="Send"
+              leadingIcon={Send24Regular}
               className={apiKeyInvalid ? "indexnow-Disabled" : ""}
             >
               <p className="cardDescription">
                 This feature allows you to submit a URL directly to IndexNow supporting search engines.
               </p>
-              <DefaultButton
+              <Button
                 disabled={apiKeyInvalid}
                 onClick={() => {
                   // reset UI controls and display modal
                   setTextFieldValueUrlSubmit("");
-                  setModalState(DashboardModalState.SubmitUrlModal);
+                  openModal(DashboardModalState.SubmitUrlModal);
                 }}
                 style={{marginLeft : "26px"}}
                 className="button submitButton"
-                text="Submit URL"
-              />
+              >
+                Submit URL
+              </Button>
             </Card>
           </div>
 
@@ -345,7 +485,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                 "indexnow-Card-WithPopOver " + (apiKeyInvalid ? "indexnow-Disabled" : "")
               }
               tooltip="This feature allows to configure automation to submit new, updated & deleted URLs to IndexNow and stay updated."
-              leadingIconName="Rocket"
+              leadingIcon={Rocket24Regular}
             >
               <p className="cardDescription">
                 {apiSettings
@@ -359,23 +499,33 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
               className={
                 "indexnow-PopOverMenu " + (apiKeyInvalid ? "indexnow-Disabled" : "")
               }
-              onMouseEnter={() => {
-                // don't show popover menu if API key is invalid
-                !apiKeyInvalid && setShowAutoSubmissionsPopOverMenu(true);
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!apiKeyInvalid) {
+                  setShowAutoSubmissionsPopOverMenu(!showAutoSubmissionsPopOverMenu);
+                }
               }}
-              onMouseLeave={() => {
-                setShowAutoSubmissionsPopOverMenu(false);
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setShowAutoSubmissionsPopOverMenu(false);
               }}
+              role="button"
+              tabIndex={0}
+              aria-expanded={showAutoSubmissionsPopOverMenu}
+              aria-haspopup="menu"
+              aria-label="Auto-submission options"
             >
-              <Icon iconName="MoreVertical" className="moreIcon" />
+              <MoreVertical24Regular className="moreIcon" />
               <div className="popOverContainer">
                 <ul
                   className={
                     "popOverPanel" +
                     (showAutoSubmissionsPopOverMenu ? " openPopOverMenu" : "")
                   }
+                  role="menu"
                 >
                   <li
+                    role="menuitem"
+                    tabIndex={showAutoSubmissionsPopOverMenu ? 0 : -1}
                     onClick={() => {
                       // reset UI controls settings and display modal
                       setSelectedOptionAutoSubmissions(
@@ -383,7 +533,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                           ? "enable"
                           : "disable"
                       );
-                      setModalState(
+                      openModal(
                         DashboardModalState.EditPrefAutoSubmissionModal
                       );
                     }}
@@ -396,13 +546,12 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </div>
         </div>
 
-
         <div className="indexnow-CardRow">
           <div className="indexnow-OverviewSection">
             <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Successful submissions"
-              leadingIconName={"Bullseye"}
+              leadingIcon={TargetArrow24Regular}
               tooltip={"Successful submissions "}
             >
               <p className="cardDescription">
@@ -419,7 +568,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
             <div className="indexnow-CardColumn indexnow-CardColumn-2">
             <Card
               title="Failed submissions"
-              leadingIconName={"StatusErrorFull"}
+              leadingIcon={ErrorCircle24Filled}
               tooltip={"Failed submissions "}
             >
               <p className="cardDescription">
@@ -438,36 +587,62 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
 
         <div className="sectionTitleContainer">
           <h2 className="sectionTitle">URLs submitted</h2>
-          <DefaultButton
+          <Button
             disabled={
               submissionsList?.Submissions === null ||
               submissionsList?.Submissions.length === 0
             }
             onClick={downloadUrls}
             className="button submitButton"
-            text="Download"
-          />
+          >
+            Download
+          </Button>
         </div>
         <div className="indexnow-CardRow">
           <div className="indexnow-CardColumn indexnow-CardColumn-1 indexnow-UrlSubmissions">
-            <ShimmeredDetailsList
-              setKey="items"
-              items={submissionsList?.Submissions ?? []}
-              columns={urlSubmissionTableColumns}
-              selectionMode={SelectionMode.none}
-              enableShimmer={submissionsList === undefined}
-              detailsListStyles={{root : {borderRadius : "12px"}}}
-              ariaLabelForShimmer="Content is being fetched"
-              ariaLabelForGrid="Item details"
-              listProps={{ renderedWindowsAhead: 0, renderedWindowsBehind: 0 }}
-              onRenderCheckbox={(props) => {
-                return props?.checked ? (
-                  <Icon iconName="CheckboxComposite" className="" />
+            <Table aria-label="URL submissions" className="indexnow-SubmissionsTable">
+              <TableHeader>
+                <TableRow>
+                  <TableHeaderCell className="col-url">URL</TableHeaderCell>
+                  <TableHeaderCell className="col-date">Submitted On</TableHeaderCell>
+                  <TableHeaderCell className="col-status">Status</TableHeaderCell>
+                  <TableHeaderCell className="col-action"></TableHeaderCell>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {submissionsList === undefined ? (
+                  Array.from({length: 5}).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="col-url"><Skeleton><SkeletonItem /></Skeleton></TableCell>
+                      <TableCell className="col-date"><Skeleton><SkeletonItem /></Skeleton></TableCell>
+                      <TableCell className="col-status"><Skeleton><SkeletonItem /></Skeleton></TableCell>
+                      <TableCell className="col-action"><Skeleton><SkeletonItem /></Skeleton></TableCell>
+                    </TableRow>
+                  ))
                 ) : (
-                  <Icon iconName="Checkbox" className="" />
-                );
-              }}
-            />
+                  (submissionsList?.Submissions ?? []).map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="col-url">
+                        <a href={item.url} target="_blank" rel="noreferrer">
+                          {decodeURI(item.url)}
+                        </a>
+                      </TableCell>
+                      <TableCell className="col-date">{formatSubmissionDate(item.submission_date)}</TableCell>
+                      <TableCell className="col-status">{item.error === "Success" ? item.error : `Failed - ${item.error}`}</TableCell>
+                      <TableCell className="col-action">
+                        <Button
+                          appearance="transparent"
+                          icon={<ArrowSync24Regular />}
+                          onClick={() => resubmitItem(item)}
+                          aria-label="Resubmit"
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
 
@@ -478,69 +653,74 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           </p>
           <p>
             Learn more about {" "}
-            <a href={StringConstants.IndexNowLink} target="_blank">IndexNow!</a>
+            <a href={StringConstants.IndexNowLink} target="_blank" rel="noreferrer">IndexNow!</a>
           </p>
         </div>
       </div>
+      {modalState !== DashboardModalState.Hidden && (
+        <div
+          className="indexnow-ModalBackdrop"
+          onClick={closeModal}
+          aria-hidden="true"
+        />
+      )}
       <div
+        ref={modalRef}
         className={
           "indexnow-Modal" +
           (modalState !== DashboardModalState.Hidden ? " showModal" : "")
         }
+        role={modalState !== DashboardModalState.Hidden ? "dialog" : undefined}
+        aria-modal={modalState !== DashboardModalState.Hidden ? "true" : undefined}
+        aria-labelledby={modalState !== DashboardModalState.Hidden ? "indexnow-modal-title" : undefined}
       >
         {modalState === DashboardModalState.UpdateApiKeyModal && (
           <div className={"modalContainer indexnow-ModalUpdateApiKey"}>
             <div className="modalHeader">
-              <p className="modalTitle">API Key</p>
-              <Icon
-                iconName="ChromeClose"
-                className="indexnow-Icon modalClose"
-                onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
-                }}
+              <p className="modalTitle" id="indexnow-modal-title">API Key</p>
+              <Button
+                appearance="transparent"
+                icon={<Dismiss24Regular />}
+                className="modalClose"
+                onClick={closeModal}
+                aria-label="Close"
+                size="small"
               />
             </div>
             <div className="modalContent">
-              <TextField
-              readOnly = {true}
+              <Input
+                readOnly
                 placeholder="Enter 32 digit API key"
                 className="textField"
                 value={textFieldValueApiKey}
-                onChange={(event, val) => {
-                  setTextFieldValueApiKey(val || "");
-                }}
-                validateOnLoad={false}
-                onGetErrorMessage={() => {
-                  return !ApiKeyRegex.test(textFieldValueApiKey) ||
-                    textFieldValueApiKey.length !== 32
-                    ? StringConstants.ApiKeyValidationError
-                    : "";
+                onChange={(event, data) => {
+                  setTextFieldValueApiKey(data.value);
                 }}
               />
             </div>
             <div className="modalFooter">
-              <DefaultButton
+              <Button
                 className="button secondaryButton"
-                text="Got it"
-                onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
-                }}
-              />
+                onClick={closeModal}
+              >
+                Got it
+              </Button>
             </div>
           </div>
         )}
         {modalState === DashboardModalState.EditPrefAutoSubmissionModal && (
           <div className="modalContainer indexnow-ModalEditPreferenceAutoSubmissions">
             <div className="modalHeader">
-              <p className="modalTitle">
+              <p className="modalTitle" id="indexnow-modal-title">
                 Edit preference for Automate URL Submission
               </p>
-              <Icon
-                iconName="ChromeClose"
-                className="indexnow-Icon modalClose"
-                onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
-                }}
+              <Button
+                appearance="transparent"
+                icon={<Dismiss24Regular />}
+                className="modalClose"
+                onClick={closeModal}
+                aria-label="Close"
+                size="small"
               />
             </div>
             <div className="modalContent">
@@ -548,34 +728,35 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
                 We recommend you to enable automation to submit new, updated &
                 deleted URLs to IndexNow and stay updated.
               </p>
-              <ChoiceGroup
-                selectedKey={selectedOptionAutoSubmissions}
-                options={autoSubmissionOptions}
-                onChange={(event, option) => {
-                  if (option !== undefined) {
-                    setSelectedOptionAutoSubmissions(option.key);
-                  }
+              <RadioGroup
+                value={selectedOptionAutoSubmissions}
+                onChange={(event, data) => {
+                  setSelectedOptionAutoSubmissions(data.value);
                 }}
-              />
+              >
+                <Radio value="enable" label="Enable (recommended)" />
+                <Radio value="disable" label="Disable" />
+              </RadioGroup>
             </div>
             <div className="modalFooter">
-              <PrimaryButton
+              <Button
+                appearance="primary"
                 className="button primaryButton"
-                text="Save"
                 onClick={onClickUpdateAutoSubmissions}
                 disabled={
                   (apiSettings?.AutoSubmissionEnabled
                     ? "enable"
                     : "disable") === selectedOptionAutoSubmissions
                 }
-              />
-              <DefaultButton
+              >
+                Save
+              </Button>
+              <Button
                 className="button secondaryButton"
-                text="Cancel"
-                onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
-                }}
-              />
+                onClick={closeModal}
+              >
+                Cancel
+              </Button>
             </div>
           </div>
         )}
@@ -583,45 +764,195 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
         {modalState === DashboardModalState.SubmitUrlModal && (
           <div className="modalContainer indexnow-ModalUrlSubmit">
             <div className="modalHeader">
-              <p className="modalTitle">Manual URL submission</p>
-              <Icon
-                iconName="ChromeClose"
-                className="indexnow-Icon modalClose"
-                onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
-                }}
+              <p className="modalTitle" id="indexnow-modal-title">Manual URL submission</p>
+              <Button
+                appearance="transparent"
+                icon={<Dismiss24Regular />}
+                className="modalClose"
+                onClick={closeModal}
+                aria-label="Close"
+                size="small"
               />
             </div>
             <div className="modalContent">
-              <TextField
-                placeholder="Enter URL to submit"
-                className="textField"
-                value={textFieldValueUrlSubmit}
-                validateOnLoad={false}
-                onGetErrorMessage={() => {
-                  return !SubmitUrlRegex.test(textFieldValueUrlSubmit)
+              <Field
+                validationMessage={
+                  textFieldValueUrlSubmit.length > 0 && !SubmitUrlRegex.test(textFieldValueUrlSubmit)
                     ? StringConstants.UrlSubmitErrorMessage
-                    : "";
-                }}
-                onChange={(event, val) => {
-                  setTextFieldValueUrlSubmit(val?.trim() || "");
-                }}
-              />
+                    : undefined
+                }
+                validationState={
+                  textFieldValueUrlSubmit.length > 0 && !SubmitUrlRegex.test(textFieldValueUrlSubmit)
+                    ? "error"
+                    : "none"
+                }
+              >
+                <Input
+                  placeholder="Enter URL to submit"
+                  className="textField"
+                  value={textFieldValueUrlSubmit}
+                  onChange={(event, data) => {
+                    setTextFieldValueUrlSubmit(data.value?.trim() || "");
+                  }}
+                />
+              </Field>
             </div>
             <div className="modalFooter">
-              <PrimaryButton
+              <Button
+                appearance="primary"
                 className="button primaryButton"
-                text="Submit URL"
                 disabled={!SubmitUrlRegex.test(textFieldValueUrlSubmit)}
                 onClick={onClickModalSubmitUrl}
-              />
-              <DefaultButton
+              >
+                Submit URL
+              </Button>
+              <Button
                 className="button secondaryButton"
-                text="Cancel"
+                onClick={closeModal}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {modalState === DashboardModalState.EditExcludedPathsModal && (
+          <div className="modalContainer indexnow-ModalExcludedPaths">
+            <div className="modalHeader">
+              <p className="modalTitle" id="indexnow-modal-title">Manage Excluded Paths</p>
+              <Button
+                appearance="transparent"
+                icon={<Dismiss24Regular />}
+                className="modalClose"
                 onClick={() => {
-                  setModalState(DashboardModalState.Hidden);
+                  closeModal();
+                  setEditingPathIndex(null);
+                  setNewPathValue("");
                 }}
+                aria-label="Close"
+                size="small"
               />
+            </div>
+            <div className="modalContent">
+              <p className="modalDescription">
+                URL paths matching these patterns will be excluded from automatic IndexNow submissions.
+              </p>
+              <p className="modalDescription">
+                Wildcards supported: <code>*</code> (any characters), <code>?</code> (single character).
+              </p>
+              <p className="modalDescription" style={{marginBottom: "15px", color: "#666"}}>
+                Examples: <code>/private/*</code>, <code>/draft-*</code>, <code>/internal/page</code>.
+              </p>
+
+              {/* Add new path */}
+              <div style={{display: "flex", gap: "10px", marginBottom: "15px"}}>
+                <Input
+                  placeholder="Enter path pattern (e.g., /private/*)"
+                  style={{flex: 1}}
+                  value={newPathValue}
+                  disabled={excludedPathsList.length >= MAX_EXCLUDED_PATHS}
+                  onChange={(event, data) => setNewPathValue(data.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      addExcludedPath();
+                    }
+                  }}
+                />
+                <Button
+                  appearance="primary"
+                  disabled={!newPathValue.trim() || excludedPathsList.length >= MAX_EXCLUDED_PATHS}
+                  onClick={addExcludedPath}
+                >
+                  Add
+                </Button>
+              </div>
+
+              <p style={{fontSize: "12px", color: "#666", marginBottom: "10px"}}>
+                {excludedPathsList.length} / {MAX_EXCLUDED_PATHS} paths configured
+              </p>
+
+              {/* List of excluded paths */}
+              <div style={{maxHeight: "300px", overflowY: "auto", border: "1px solid #edebe9", borderRadius: "4px"}}>
+                {excludedPathsList.length === 0 ? (
+                  <p style={{padding: "20px", textAlign: "center", color: "#666"}}>
+                    No excluded paths configured. Add a path pattern above.
+                  </p>
+                ) : (
+                  excludedPathsList.map((path, index) => (
+                    <div 
+                      key={index} 
+                      style={{
+                        display: "flex", 
+                        alignItems: "center", 
+                        padding: "8px 12px",
+                        borderBottom: index < excludedPathsList.length - 1 ? "1px solid #edebe9" : "none",
+                        backgroundColor: index % 2 === 0 ? "#faf9f8" : "#fff"
+                      }}
+                    >
+                      {editingPathIndex === index ? (
+                        <>
+                          <Input
+                            value={editingPathValue}
+                            style={{flex: 1, marginRight: "10px"}}
+                            onChange={(event, data) => setEditingPathValue(data.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                saveEditedPath();
+                              }
+                            }}
+                          />
+                          <Button
+                            appearance="transparent"
+                            icon={<Checkmark24Regular />}
+                            aria-label="Save"
+                            onClick={saveEditedPath}
+                            style={{color: "#107c10"}}
+                            size="small"
+                          />
+                          <Button
+                            appearance="transparent"
+                            icon={<Dismiss24Regular />}
+                            aria-label="Cancel"
+                            onClick={cancelEditingPath}
+                            size="small"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <code style={{flex: 1, fontSize: "13px"}}>{path}</code>
+                          <Button
+                            appearance="transparent"
+                            icon={<Edit24Regular />}
+                            aria-label="Edit path"
+                            onClick={() => startEditingPath(index)}
+                            size="small"
+                          />
+                          <Button
+                            appearance="transparent"
+                            icon={<Delete24Regular />}
+                            aria-label="Delete path"
+                            onClick={() => deleteExcludedPath(index)}
+                            style={{color: "#a80000"}}
+                            size="small"
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="modalFooter">
+              <Button
+                className="button secondaryButton"
+                onClick={() => {
+                  closeModal();
+                  setEditingPathIndex(null);
+                  setNewPathValue("");
+                }}
+              >
+                Close
+              </Button>
             </div>
           </div>
         )}

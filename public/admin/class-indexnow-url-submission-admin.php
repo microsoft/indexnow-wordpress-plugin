@@ -140,6 +140,115 @@ class BWT_IndexNow_Admin {
 		return array_merge($settings_link, $links);
 	}
 
+	/**
+	 * Check if a post/page has noindex directive set.
+	 * This method fetches the actual rendered HTML and checks for the standard
+	 * <meta name="robots" content="noindex"> tag, which works with any SEO plugin.
+	 * 
+	 * @param WP_Post $post The post object to check
+	 * @param string $url The URL to check for noindex
+	 * @return bool True if noindex is set, false otherwise
+	 */
+	private function has_noindex_directive($post, $url) {
+		// Check if WordPress site-wide search engine visibility is disabled
+		if (get_option('blog_public') == '0') {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " Site-wide search engine discouragement enabled");
+			}
+			return true;
+		}
+
+		// Fetch the page and check for noindex meta tag and X-Robots-Tag header
+		// Use a short timeout to avoid delays in post publishing
+		$response = wp_safe_remote_get($url, array(
+			'timeout' => 5,
+			'sslverify' => false, // Allow self-signed certs for local dev
+		));
+
+		if (is_wp_error($response)) {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " Could not fetch URL for noindex check: " . $url . " - " . $response->get_error_message());
+			}
+			return false;
+		}
+
+		// Check X-Robots-Tag HTTP header
+		$headers = wp_remote_retrieve_headers($response);
+		$robots_header = '';
+		if (isset($headers['x-robots-tag'])) {
+			$robots_header = $headers['x-robots-tag'];
+		} elseif (isset($headers['X-Robots-Tag'])) {
+			$robots_header = $headers['X-Robots-Tag'];
+		}
+		
+		if (!empty($robots_header) && stripos($robots_header, 'noindex') !== false) {
+			if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+				error_log(__METHOD__ . " X-Robots-Tag noindex header detected for URL: " . $url);
+			}
+			return true;
+		}
+
+		// Check HTML meta robots tag
+		$body = wp_remote_retrieve_body($response);
+		if (!empty($body)) {
+			// Match <meta name="robots" content="...noindex..."> (case insensitive)
+			// Also check for googlebot, bingbot specific directives
+			if (preg_match('/<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex[^"\']*["\'][^>]*>/i', $body) ||
+				preg_match('/<meta[^>]+content=["\'][^"\']*noindex[^"\']*["\'][^>]+name=["\']robots["\'][^>]*>/i', $body)) {
+				if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+					error_log(__METHOD__ . " Meta robots noindex tag detected for URL: " . $url);
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a URL path matches any excluded path patterns.
+	 * 
+	 * @param string $url The URL to check
+	 * @return bool True if URL should be excluded, false otherwise
+	 */
+	private function is_path_excluded($url) {
+		$excluded_paths = get_option($this->prefix . 'excluded_paths', '');
+		
+		if (empty($excluded_paths)) {
+			return false;
+		}
+
+		// Parse URL to get the path
+		$parsed_url = wp_parse_url($url);
+		$path = isset($parsed_url['path']) ? $parsed_url['path'] : '/';
+
+		// Split excluded paths by newline and filter empty lines
+		$patterns = array_filter(array_map('trim', explode("\n", $excluded_paths)));
+
+		foreach ($patterns as $pattern) {
+			// Skip empty patterns
+			if (empty($pattern)) {
+				continue;
+			}
+
+			// Support wildcard patterns (e.g., /private/*, /draft-*)
+			$regex_pattern = str_replace(
+				array('\*', '\?'),
+				array('.*', '.'),
+				preg_quote($pattern, '/')
+			);
+
+			if (preg_match('/^' . $regex_pattern . '$/i', $path)) {
+				if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+					error_log(__METHOD__ . " URL excluded by path pattern: " . $url . " matched " . $pattern);
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// This function checks the type of update on a page/post and accordingly calls the submit api if enabled
 	public function on_post_published($new_status, $old_status, $post)
 	{
@@ -194,6 +303,22 @@ class BWT_IndexNow_Admin {
 					}
 				}
 
+				// Check for noindex directive - don't submit URLs that should not be indexed
+				if ($type != 'delete' && $this->has_noindex_directive($post, $link)) {
+					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " Skipping URL submission due to noindex directive: " . $link);
+					}
+					return;
+				}
+
+				// Check for excluded paths - don't submit URLs that match excluded patterns
+				if ($this->is_path_excluded($link)) {
+					if (true === WP_DEBUG && true === WP_DEBUG_LOG) {
+						error_log(__METHOD__ . " Skipping URL submission due to excluded path: " . $link);
+					}
+					return;
+				}
+
 				$siteUrl = get_home_url();
 
 				// check if same url was submitted recently(within a minute)
@@ -202,7 +327,24 @@ class BWT_IndexNow_Admin {
 				}
 				$api_key = base64_decode($admin_api_key);
 				$output = $this->routes->submit_url_to_bwt($siteUrl, $link, $api_key, $type, false);
-				$this->routes->update_submission_output($output, $link);
+
+				if ( $output === 'success' ) {
+					$this->routes->update_submission_output( $output, $link );
+					return;
+				}
+
+				// Permanent client errors should not be retried
+				$non_retryable_errors = array( 'error:InvalidRequest', 'error:InvalidApiKey', 'error:InvalidUrl' );
+				if ( in_array( $output, $non_retryable_errors, true ) ) {
+					$this->routes->update_submission_output( $output, $link );
+					return;
+				}
+
+				// Transient/server errors: queue for retry with exponential backoff
+				if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+					error_log( __METHOD__ . ' Submission failed (' . $output . '), queueing URL for retry: ' . $link );
+				}
+				BWT_IndexNow_Admin_Utils::add_to_retry_queue( $link, $type, 60, 3 );
 			}
 		}
 	}
@@ -215,6 +357,104 @@ class BWT_IndexNow_Admin {
 	public function validate($input)
 	{
 		return $input;
+	}
+
+	/**
+	 * Register a custom "every_minute" cron interval for retry queue processing.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array Modified cron schedules.
+	 */
+	public function add_cron_intervals( $schedules ) {
+		if ( ! isset( $schedules['every_minute'] ) ) {
+			$schedules['every_minute'] = array(
+				'interval' => 60,
+				'display'  => __( 'Every Minute' ),
+			);
+		}
+		return $schedules;
+	}
+
+	/**
+	 * Process the retry queue: re-submit URLs that previously failed due to transient errors
+	 * (e.g., 429 rate limiting, network failures, server errors).
+	 * Called by the WP-Cron event 'indexnow_process_retry_queue'.
+	 *
+	 * Uses batch submission (up to 10K URLs per request) and exponential backoff.
+	 */
+	public function process_retry_queue() {
+		$admin_api_key = get_option( $this->prefix . 'admin_api_key' );
+		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
+
+		if ( ! $is_valid_api_key || $is_valid_api_key !== '1' || empty( $admin_api_key ) ) {
+			return;
+		}
+
+		$pending = BWT_IndexNow_Admin_Utils::get_pending_retries( BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+
+		if ( empty( $pending ) ) {
+			return;
+		}
+
+		$api_key = base64_decode( $admin_api_key );
+		$siteUrl = get_home_url();
+
+		// Group by type so we can batch URLs of the same type
+		$grouped = array();
+		foreach ( $pending as $item ) {
+			$grouped[ $item->type ][] = $item;
+		}
+
+		foreach ( $grouped as $type => $items ) {
+			// Batch URLs into chunks of URL_LIST_MAX_SIZE
+			$chunks = array_chunk( $items, BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+
+			foreach ( $chunks as $chunk ) {
+				$urls = array_map( function( $item ) {
+					return $item->url;
+				}, $chunk );
+
+				$output = $this->routes->submit_urls_batch_to_bwt( $siteUrl, $urls, $api_key, $type, false );
+
+				if ( $output === 'success' ) {
+					// Success: remove from queue, log as passed
+					foreach ( $chunk as $item ) {
+						BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+						$this->routes->update_submission_output( $output, $item->url );
+					}
+					if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+						error_log( __METHOD__ . ' Retry batch succeeded: ' . count( $chunk ) . ' URLs of type ' . $type );
+					}
+				} elseif ( $output === 'error:TooManyRequests' ) {
+					// Still rate-limited: increment retry count with exponential backoff
+					foreach ( $chunk as $item ) {
+						$new_count = (int) $item->retry_count + 1;
+						if ( $new_count >= (int) $item->max_retries ) {
+							// Max retries exceeded: move to failed submissions
+							BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+							$this->routes->update_submission_output( 'error:TooManyRequests', $item->url );
+							if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+								error_log( __METHOD__ . ' Max retries exceeded for: ' . $item->url );
+							}
+						} else {
+							BWT_IndexNow_Admin_Utils::update_retry_item( $item->id, $new_count, WP_IN_Errors::TooManyRequests );
+						}
+					}
+				} else {
+					// Other error: increment retry or fail permanently
+					foreach ( $chunk as $item ) {
+						$new_count = (int) $item->retry_count + 1;
+						if ( $new_count >= (int) $item->max_retries ) {
+							BWT_IndexNow_Admin_Utils::delete_retry_item( $item->id );
+							$this->routes->update_submission_output( $output, $item->url );
+						} else {
+							$error_msg = substr( $output, 0, 6 ) === 'error:' ? substr( $output, 6 ) : $output;
+							BWT_IndexNow_Admin_Utils::update_retry_item( $item->id, $new_count, $error_msg );
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**

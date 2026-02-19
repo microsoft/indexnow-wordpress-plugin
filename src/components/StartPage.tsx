@@ -2,8 +2,14 @@ import "../scss/StartPage.scss";
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { PrimaryButton } from "@fluentui/react/lib/Button";
-import { Icon } from "@fluentui/react/lib/Icon";
+import { Button } from "@fluentui/react-components";
+import {
+  Rocket24Regular,
+  Send24Regular,
+  NumberSymbol24Regular,
+  ErrorCircle24Regular,
+  TextBulletListLtr24Regular,
+} from "@fluentui/react-icons";
 import { SetApiKey } from "./withDashboardData";
 import { ApiKeyRegex, StringConstants } from "../Constants";
 import { GetApiKey } from "./withDashboardData";
@@ -42,23 +48,23 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
 
         <div className="featuresListContainer">
           <div className="featureItem">
-            <Icon iconName="Rocket" className="featureIcon" />
+            <Rocket24Regular className="featureIcon" />
             <p>Automate URL submissions</p>
           </div>
           <div className="featureItem">
-            <Icon iconName="Send" className="featureIcon" />
+            <Send24Regular className="featureIcon" />
             <p>Manual URL submissions</p>
           </div>
           <div className="featureItem">
-            <Icon iconName="NumberField" className="featureIcon" />
+            <NumberSymbol24Regular className="featureIcon" />
             <p>View stats of submitted URLs</p>
           </div>
           <div className="featureItem">
-            <Icon iconName="ErrorBadge" className="featureIcon" />
+            <ErrorCircle24Regular className="featureIcon" />
             <p>View recent submissions</p>
           </div>
           <div className="featureItem">
-            <Icon iconName="BulletedList" className="featureIcon" />
+            <TextBulletListLtr24Regular className="featureIcon" />
             <p>Re-submit recent submissions</p>
           </div>
         </div>
@@ -70,12 +76,14 @@ export const StartPage: React.FunctionComponent<IStartPage> = (props) => {
           IndexNow, Easy to use protocol that websites can call to notify whenever website contents on any URL is updated or created allowing instant crawling, and discovery of the URL
           </p>
           <div>
-            <PrimaryButton
+            <Button
+              appearance="primary"
               className="button submitButton"
-              text="Let's Get Started!"
               onClick={onSubmitApiKey}
               disabled={!ApiKeyRegex.test(apiKey) || apiKey.length !== 32}
-            />
+            >
+              Let&apos;s Get Started!
+            </Button>
           </div>
         </div>
       </div>

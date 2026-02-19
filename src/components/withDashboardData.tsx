@@ -12,6 +12,9 @@ import {
   IRetryFailedSubmissionsRequest,
   ISetAutoSubmissionEnabledResponse,
   ISetAutoSubmissionEnabledRequest,
+  IGetExcludedPathsResponse,
+  ISetExcludedPathsRequest,
+  ISetExcludedPathsResponse,
   UrlSubmission,
   IGetInsightsUrlResponse,
 } from "./Interfaces";
@@ -127,5 +130,30 @@ export async function GetIndexNowInsightsUrl() {
     console.error("Error while fetching login URL of Bing webmaster tools.");
     return err;
   });
+  return response;
+}
+
+export async function GetExcludedPaths() {
+  let response: IHttpResponse<IGetExcludedPathsResponse>;
+  const url = `excludedPaths`;
+  response = await useFetch<IGetExcludedPathsResponse>(url).catch((err) => {
+    console.error("Error while fetching excluded paths.");
+    return err;
+  });
+  return response;
+}
+
+export async function UpdateExcludedPaths(excludedPaths: string) {
+  const param: ISetExcludedPathsRequest = {
+    ExcludedPaths: excludedPaths,
+  };
+  let response: IHttpResponse<ISetExcludedPathsResponse>;
+  const url = `excludedPaths`;
+  response = await useSubmit<ISetExcludedPathsResponse>(url, param).catch(
+    (err) => {
+      console.error("Error while updating excluded paths.");
+      return err;
+    }
+  );
   return response;
 }

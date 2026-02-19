@@ -1,4 +1,6 @@
-﻿@mixin opacity($opacity) {
-    opacity: $opacity / 100;
-    filter: "alpha(opacity=${opacity})";
+﻿@use "sass:math";
+
+@mixin opacity($opacity) {
+    opacity: math.div($opacity, 100);
+    filter: unquote("alpha(opacity=#{$opacity})");
 }
