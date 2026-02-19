@@ -4,7 +4,7 @@ Plugin link: https://bing.com/indexnow
 Tags: seo, crawling
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 Requires PHP: 5.6.20
@@ -65,12 +65,9 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 == Changelog ==
 
 = 1.0.4 =
-* Universal noindex detection by parsing actual HTML meta robots tags (works with any SEO plugin).
+* Universal noindex detection by parsing actual HTML meta robots tags.
 * Add excluded paths feature to prevent submission of specific URL patterns.
-* Support for wildcard patterns in excluded paths (e.g., /private/*, /draft-*).
-* Support for X-Robots-Tag HTTP headers.
-* Support for WordPress site-wide search engine visibility settings.
-* Improved logging for debugging.
+* Fix package vulnerabilities.
 
 = 1.0.3 =
 * Fix for resubmit button not working.

@@ -47,10 +47,8 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 
 - Universal noindex detection by parsing actual HTML meta robots tags (works with any SEO plugin).
 - Add excluded paths feature to prevent submission of specific URL patterns.
-- Support for wildcard patterns in excluded paths (e.g., /private/*, /draft-*).
-- Support for X-Robots-Tag HTTP headers.
-- Support for WordPress site-wide search engine visibility settings.
-- Improved logging for debugging.
+- Fix package vulnerabilities.
+
 
 ### 1.0.3
 
