@@ -64,6 +64,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "prebuild": "node scripts/test.js --watchAll=false --ci",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "clean": "rimraf build publish",
@@ -120,12 +121,20 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
-      "!src/**/*.d.ts"
+      "!src/**/*.d.ts",
+      "!src/__tests__/setup.ts",
+      "!src/__tests__/testUtils.tsx",
+      "!src/serviceWorker.js",
+      "!src/index.js"
     ],
-    "setupFiles": [],
-    "setupFilesAfterSetup": [],
+    "setupFiles": [
+      "<rootDir>/src/__tests__/setup.ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
     "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/__tests__/**/*.test.{js,jsx,ts,tsx}",
       "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
     ],
     "testEnvironment": "jsdom",
@@ -141,7 +150,8 @@
     "modulePaths": [],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "\\\\.(scss|sass|css)$": "identity-obj-proxy"
     },
     "moduleFileExtensions": [
       "web.js",
