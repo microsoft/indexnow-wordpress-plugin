@@ -6,7 +6,7 @@ Some other handy features included in the plugin:
 
 - Toggle the automatic submission feature.
 - Exclude specific URL paths from auto-submission using wildcard patterns.
-- Automatic noindex detection (works with any SEO plugin).
+- Automatic noindex detection.
 - Manually submit a URL to IndexNow.
 - View list of recent URL submissions from the plugin.
 - Retry any failed submissions from the recent submissions list.
@@ -45,7 +45,7 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 
 ### 1.0.4
 
-- Migrate UI to Fluent UI v9 with accessibility improvements (focus outlines, modal focus trap, ARIA attributes).
+- Migrate UI to Fluent UI v9 with accessibility improvements.
 - Universal noindex detection by parsing HTML meta robots tags and X-Robots-Tag header.
 - Excluded paths feature to prevent submission of specific URL patterns.
 - Retry support for failed URL submissions.
