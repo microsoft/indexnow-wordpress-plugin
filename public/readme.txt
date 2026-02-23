@@ -65,9 +65,12 @@ Indexing of URLs is specific and dependent on each search engine’s rules, plea
 == Changelog ==
 
 = 1.0.4 =
-* Universal noindex detection by parsing actual HTML meta robots tags.
-* Add excluded paths feature to prevent submission of specific URL patterns.
-* Fix package vulnerabilities.
+* Migrate UI to Fluent UI v9 with accessibility improvements.
+* Universal noindex detection by parsing HTML meta robots tags and X-Robots-Tag header.
+* Excluded paths feature to prevent submission of specific URL patterns.
+* Retry support for failed URL submissions.
+* Error banners for API key load failures.
+* Fix package vulnerabilities and dependency upgrades.
 
 = 1.0.3 =
 * Fix for resubmit button not working.
