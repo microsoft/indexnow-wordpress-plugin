@@ -6,7 +6,7 @@
  * used in the real app entry-point).
  *
  * Usage in test files:
- *   import { render, screen, fireEvent } from '../testUtils';
+ *   import { render, screen, fireEvent } from './testUtils';
  */
 
 import React from 'react';

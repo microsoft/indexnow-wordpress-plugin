@@ -106,7 +106,7 @@ describe('UpdateAutoSubmissionsEnabled', () => {
 
 describe('RetryFailedSubmissions', () => {
   it('sends submissions array', async () => {
-    const subs = [{ url: 'https://x.com', submission_type: 0, submission_date: 0, error: 'err', type: 0 as any }];
+    const subs = [{ url: 'https://x.com', submission_type: 0, submission_date: 0, error: 'err', type: 0 }];
     mockSubmit.mockResolvedValue({ data: { hasError: false, SubmissionErrors: [], error_type: '' } });
     await RetryFailedSubmissions(subs);
     expect(mockSubmit).toHaveBeenCalledWith('allSubmissions', { Submissions: subs });

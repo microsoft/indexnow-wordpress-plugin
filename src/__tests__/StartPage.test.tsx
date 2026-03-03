@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from './testUtils';
+import { render, screen } from './testUtils';
 import { StartPage } from '../components/StartPage';
 
 // Mock the API calls used by StartPage

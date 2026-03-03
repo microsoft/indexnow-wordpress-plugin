@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from './testUtils';
+import { render, screen, waitFor } from './testUtils';
 import { Dashboard } from '../components/Dashboard';
 
 const mockGetApiKey = jest.fn();
