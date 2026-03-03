@@ -15,7 +15,7 @@ function mockFetchSuccess<T>(body: T, status = 200) {
     ok: status >= 200 && status < 300,
     status,
     json: () => Promise.resolve(body),
-    headers: new Headers(),
+    headers: { get: () => null, has: () => false },
   });
 }
 
@@ -53,7 +53,7 @@ describe('useFetch', () => {
       ok: false,
       status: 403,
       json: () => Promise.resolve(errBody),
-      headers: new Headers(),
+      headers: { get: () => null, has: () => false },
     });
 
     const res = await useFetch('apiKey');

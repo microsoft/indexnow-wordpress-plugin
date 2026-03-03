@@ -12,7 +12,22 @@
   indexnow_api_url: 'https://example.com/wp-json/indexnow-url-submission/v_1.0.4/',
 };
 
-// Polyfill Response for jsdom (used by IndexNowAPIHelper.withTimeout)
+// Polyfill Fetch globals for jsdom / Node test environment
+if (typeof globalThis.Headers === 'undefined') {
+  (globalThis as any).Headers = class Headers {
+    private map: Map<string, string>;
+    constructor(init?: Record<string, string> | [string, string][]) {
+      const entries = Array.isArray(init) ? init : Object.entries(init ?? {});
+      this.map = new Map(entries.map(([k, v]) => [k.toLowerCase(), v]));
+    }
+    get(name: string) { return this.map.get(name.toLowerCase()) ?? null; }
+    set(name: string, value: string) { this.map.set(name.toLowerCase(), value); }
+    has(name: string) { return this.map.has(name.toLowerCase()); }
+    delete(name: string) { return this.map.delete(name.toLowerCase()); }
+    forEach(cb: (value: string, key: string) => void) { this.map.forEach(cb); }
+  };
+}
+
 if (typeof globalThis.Response === 'undefined') {
   (globalThis as any).Response = class Response {
     ok: boolean;

@@ -46,9 +46,15 @@ describe('GetApiKey', () => {
   });
 
   it('returns the error when fetch rejects', async () => {
-    mockFetch.mockRejectedValue(new Error('fail'));
-    const res = await GetApiKey();
-    expect(res).toBeInstanceOf(Error);
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      mockFetch.mockRejectedValue(new Error('fail'));
+      const res = await GetApiKey();
+      expect(res).toBeInstanceOf(Error);
+      expect(consoleErrorSpy).toHaveBeenCalled();
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
   });
 });
 
