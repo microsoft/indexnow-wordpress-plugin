@@ -371,13 +371,13 @@ class BWT_IndexNow_Admin_Routes {
 		}
 	}
 
-	public function update_submission_output($output, $url) {
+	public function update_submission_output($output, $url, $type = "add") {
 		$failed_count = get_option( $this->prefix . 'failed_count' );
 		$passed_count = get_option( $this->prefix . 'passed_count' );
 		if (substr($output, 0, 6) == 'error:') {
 			$error_msg = substr($output, 6);
 			$error_type = $this->get_api_error($error_msg);
-			$failedUrl = new IndexNowSubmissions($url, time(), 0, "add", $error_type);
+			$failedUrl = new IndexNowSubmissions($url, time(), 0, $type, $error_type);
 			BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$failed_submissions_table, $failedUrl);
 			$fail_count = null;
 			if (is_bool($failed_count)) {
@@ -394,7 +394,7 @@ class BWT_IndexNow_Admin_Routes {
 				'error' => $error_type
 				), 200 );
 		} else {
-			$passedUrl = new IndexNowSubmissions($url, time(), 1, "add", WP_IN_Errors::Success);
+			$passedUrl = new IndexNowSubmissions($url, time(), 1, $type, WP_IN_Errors::Success);
 			BWT_IndexNow_Admin_Utils::insert_submission(BWT_IndexNow_Admin_Routes::$passed_submissions_table, $passedUrl);
 			$pass_count = null;
 			if (is_bool($passed_count)) {

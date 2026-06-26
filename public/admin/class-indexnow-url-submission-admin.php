@@ -30,6 +30,14 @@ class BWT_IndexNow_Admin {
 	private $prefix = "indexnow-";
 
 	private $routes;
+
+	const RETRY_QUEUE_BATCH_SIZE = 1000;
+
+	const RETRY_QUEUE_MAX_ITEMS = 50000;
+
+	const RETRY_CRON_STALE_THRESHOLD = 86400;
+
+	const RETRY_CRON_LAST_RUN_OPTION = 'retry_cron_last_run';
 	
 	/**
 	 * Initialize the class and set its properties.
@@ -318,12 +326,11 @@ class BWT_IndexNow_Admin {
 					return;
 				}
 
-				$siteUrl = get_home_url();
-
 				// check if same url was submitted recently(within a minute)
 				if ($new_status != 'trash' && BWT_IndexNow_Admin_Utils::url_submitted_within_last_minute(BWT_IndexNow_Admin_Routes::$passed_submissions_table, $link)) {
 					return;
 				}
+				$siteUrl = get_home_url();
 				$api_key = base64_decode($admin_api_key);
 				$output = $this->routes->submit_url_to_bwt($siteUrl, $link, $api_key, $type, false);
 
@@ -343,7 +350,15 @@ class BWT_IndexNow_Admin {
 				if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
 					error_log( __METHOD__ . ' Submission failed (' . $output . '), queueing URL for retry: ' . $link );
 				}
-				BWT_IndexNow_Admin_Utils::add_to_retry_queue( $link, $type, 60, 3 );
+
+				if ( ! $this->ensure_retry_cron_scheduled() ) {
+					// Avoid unbounded queue growth when cron cannot process retries.
+					$this->routes->update_submission_output( $output, $link );
+					return;
+				}
+
+				BWT_IndexNow_Admin_Utils::add_to_retry_queue( $link, $type, 60, 3, $output );
+				$this->record_discarded_retry_items( BWT_IndexNow_Admin_Utils::trim_retry_queue( self::RETRY_QUEUE_MAX_ITEMS ) );
 			}
 		}
 	}
@@ -356,6 +371,86 @@ class BWT_IndexNow_Admin {
 	public function validate($input)
 	{
 		return $input;
+	}
+
+
+	/**
+	 * Ensure retry cron is scheduled before queueing retry items.
+	 *
+	 * @return bool True when retry cron is available, false otherwise.
+	 */
+	private function ensure_retry_cron_scheduled() {
+		$next_scheduled = wp_next_scheduled( 'indexnow_process_retry_queue' );
+		if ( false !== $next_scheduled ) {
+			$last_run = $this->get_retry_cron_last_run();
+			$stale_cutoff = time() - self::RETRY_CRON_STALE_THRESHOLD;
+
+			if ( $next_scheduled >= $stale_cutoff || $last_run >= $stale_cutoff ) {
+				return true;
+			}
+
+			$discarded = BWT_IndexNow_Admin_Utils::clear_retry_queue();
+			$this->record_discarded_retry_items( $discarded );
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' Retry cron appears stale; retry queue cleared for ' . count( $discarded ) . ' item(s). Last run: ' . $last_run );
+			}
+			return false;
+		}
+
+		$scheduled = wp_schedule_event( time() + 60, 'every_minute', 'indexnow_process_retry_queue' );
+		if ( false === $scheduled || is_wp_error( $scheduled ) ) {
+			$discarded = BWT_IndexNow_Admin_Utils::clear_retry_queue();
+			$this->record_discarded_retry_items( $discarded );
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				$error = is_wp_error( $scheduled ) ? $scheduled->get_error_message() : 'wp_schedule_event returned false';
+				error_log( __METHOD__ . ' Retry cron could not be scheduled; retry queue cleared for ' . count( $discarded ) . ' item(s): ' . $error );
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the last retry cron run timestamp directly from the database.
+	 *
+	 * Bulk post updates can keep an older autoloaded option value in memory while
+	 * WP-Cron updates the option in a separate request.
+	 *
+	 * @return int Last retry cron run timestamp.
+	 */
+	private function get_retry_cron_last_run() {
+		global $wpdb;
+
+		$last_run = $wpdb->get_var( $wpdb->prepare(
+			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+			$this->prefix . self::RETRY_CRON_LAST_RUN_OPTION
+		) );
+
+		return false === $last_run ? 0 : (int) $last_run;
+	}
+
+	/**
+	 * Record discarded retry queue items as failed submissions.
+	 *
+	 * @param array $items Retry queue row objects.
+	 */
+	private function record_discarded_retry_items( $items ) {
+		if ( empty( $items ) ) {
+			return;
+		}
+
+		foreach ( $items as $item ) {
+			$reason = isset( $item->last_error ) ? trim( (string) $item->last_error ) : '';
+			if ( '' === $reason ) {
+				$reason = 'error:RequestFailed';
+			} elseif ( 0 !== strpos( $reason, 'error:' ) ) {
+				$reason = 'error:' . $reason;
+			}
+
+			$type = isset( $item->type ) ? $item->type : 'add';
+			$this->routes->update_submission_output( $reason, $item->url, $type );
+		}
 	}
 
 	/**
@@ -379,20 +474,36 @@ class BWT_IndexNow_Admin {
 	 * (e.g., 429 rate limiting, network failures, server errors).
 	 * Called by the WP-Cron event 'indexnow_process_retry_queue'.
 	 *
-	 * Uses batch submission (up to 10K URLs per request) and exponential backoff.
+	 * Uses batch submission (up to 1000 URLs per request) and exponential backoff.
 	 */
 	public function process_retry_queue() {
+		update_option( $this->prefix . self::RETRY_CRON_LAST_RUN_OPTION, time() );
+
+		if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+			error_log( __METHOD__ . ' Retry cron triggered' );
+		}
+
 		$admin_api_key = get_option( $this->prefix . 'admin_api_key' );
 		$is_valid_api_key = get_option( $this->prefix . 'is_valid_api_key' );
 
-		if ( ! $is_valid_api_key || $is_valid_api_key !== '1' || empty( $admin_api_key ) ) {
+		if ( empty( $admin_api_key ) || '1' !== (string) $is_valid_api_key ) {
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' Retry queue skipped: API key missing or invalid state (' . (string) $is_valid_api_key . ')' );
+			}
 			return;
 		}
 
-		$pending = BWT_IndexNow_Admin_Utils::get_pending_retries( BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+		$pending = BWT_IndexNow_Admin_Utils::get_pending_retries();
 
 		if ( empty( $pending ) ) {
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' Retry cron found no due items' );
+			}
 			return;
+		}
+
+		if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+			error_log( __METHOD__ . ' Retry cron processing ' . count( $pending ) . ' due item(s)' );
 		}
 
 		$api_key = base64_decode( $admin_api_key );
@@ -405,8 +516,11 @@ class BWT_IndexNow_Admin {
 		}
 
 		foreach ( $grouped as $type => $items ) {
-			// Batch URLs into chunks of URL_LIST_MAX_SIZE
-			$chunks = array_chunk( $items, BWT_IndexNow_Admin_Routes::URL_LIST_MAX_SIZE );
+			$chunks = array_chunk( $items, self::RETRY_QUEUE_BATCH_SIZE );
+
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' Retry cron processing ' . count( $items ) . ' URL(s) of type ' . $type );
+			}
 
 			foreach ( $chunks as $chunk ) {
 				$urls = array_map( function( $item ) {
@@ -414,6 +528,9 @@ class BWT_IndexNow_Admin {
 				}, $chunk );
 
 				$output = $this->routes->submit_urls_batch_to_bwt( $siteUrl, $urls, $api_key, $type, false );
+				if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+					error_log( __METHOD__ . ' Retry cron batch result: ' . $output . ' for ' . count( $chunk ) . ' URL(s)' );
+				}
 
 				if ( $output === 'success' ) {
 					// Success: remove from queue, log as passed

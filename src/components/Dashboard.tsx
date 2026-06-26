@@ -407,12 +407,9 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = (props) => {
           (modalState !== DashboardModalState.Hidden ? " darken" : "")
         }
       >
-        <div className="sectionTitleContainer">
-            <h2 className="sectionTitle">IndexNow Insights in Bing Webmaster tools</h2>
-        </div>
         <div className="indexnow-CardRow">
              <div className="indexnow-CardColumn indexnow-CardColumn-2">
-                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIcon={Send24Regular} title="IndexNow Insights">
+                <Card tooltip="This feature allows you to view Indexing insights of your site in Bing webmaster tools" leadingIcon={Send24Regular} title="IndexNow Insights in Bing Webmaster tools">
                     <p className="cardDescription">
                         Monitor indexing status and performance of URLs submitted via IndexNow in Bing Webmaster tools.
                     </p>

@@ -183,7 +183,7 @@
         width: 100%;
 
         .col-url {
-          width: 60%;
+          width: 56%;
 
           a {
             word-break: break-all;
@@ -202,13 +202,17 @@
         }
 
         .col-status {
-          width: 15%;
-          white-space: nowrap;
+          width: 20%;
+          white-space: normal;
+          overflow-wrap: break-word;
+          line-height: 1.35;
         }
 
         .col-action {
-          width: 7%;
+          width: 6%;
+          min-width: 48px;
           text-align: center;
+          white-space: nowrap;
         }
 
         // Tablet — let date wrap if needed

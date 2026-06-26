@@ -129,10 +129,13 @@ class BWT_IndexNow_Admin_Utils {
 	 * @param string $type          Submission type (add/update/delete).
 	 * @param int    $delay_seconds Seconds to wait before retrying (default 60).
 	 * @param int    $max_retries   Maximum number of retry attempts (default 3).
+	 * @param string $first_error   Initial failure reason that caused the retry.
 	 */
-	public static function add_to_retry_queue( $url, $type, $delay_seconds = 60, $max_retries = 3 ) {
+	public static function add_to_retry_queue( $url, $type, $delay_seconds = 60, $max_retries = 3, $first_error = '' ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+
+		self::ensure_retry_queue_table_exists();
 
 		// Avoid duplicates: skip if URL is already queued
 		$existing = $wpdb->get_var( $wpdb->prepare(
@@ -148,7 +151,7 @@ class BWT_IndexNow_Admin_Utils {
 		}
 
 		$now = time();
-		$wpdb->insert(
+		$inserted = $wpdb->insert(
 			$table_name,
 			array(
 				'url'           => $url,
@@ -157,10 +160,17 @@ class BWT_IndexNow_Admin_Utils {
 				'max_retries'   => $max_retries,
 				'next_retry_at' => $now + $delay_seconds,
 				'created_at'    => $now,
-				'last_error'    => '',
+				'last_error'    => $first_error,
 			),
 			array( '%s', '%s', '%d', '%d', '%d', '%d', '%s' )
 		);
+
+		if ( false === $inserted ) {
+			if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+				error_log( __METHOD__ . ' Failed to add retry queue item for URL: ' . $url . '. DB error: ' . $wpdb->last_error );
+			}
+			return;
+		}
 
 		if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
 			error_log( __METHOD__ . " Added to retry queue: " . $url . " (retry in {$delay_seconds}s)" );
@@ -170,14 +180,25 @@ class BWT_IndexNow_Admin_Utils {
 	/**
 	 * Get pending retry items that are due for processing.
 	 *
-	 * @param int $limit Maximum number of items to return (default 100, max 10000).
+	 * @param int|null $limit Maximum number of items to return. Null returns all due items.
 	 * @return array Array of retry queue row objects.
 	 */
-	public static function get_pending_retries( $limit = 100 ) {
+	public static function get_pending_retries( $limit = null ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
 		$now = time();
-		$limit = min( $limit, 10000 );
+
+		if ( null === $limit ) {
+			$results = $wpdb->get_results( $wpdb->prepare(
+				"SELECT * FROM $table_name WHERE next_retry_at <= %d ORDER BY next_retry_at ASC",
+				$now
+			), OBJECT );
+
+			return is_array( $results ) ? $results : array();
+		}
+
+		$limit = max( 1, (int) $limit );
 
 		$results = $wpdb->get_results( $wpdb->prepare(
 			"SELECT * FROM $table_name WHERE next_retry_at <= %d ORDER BY next_retry_at ASC LIMIT %d",
@@ -199,6 +220,7 @@ class BWT_IndexNow_Admin_Utils {
 	public static function update_retry_item( $id, $retry_count, $last_error = '' ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
 
 		// Exponential backoff: 60s, 120s, 240s, ...
 		$delay = 60 * pow( 2, $retry_count );
@@ -229,6 +251,7 @@ class BWT_IndexNow_Admin_Utils {
 	public static function delete_retry_item( $id ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
 		$wpdb->delete( $table_name, array( 'id' => $id ), array( '%d' ) );
 	}
 
@@ -240,6 +263,7 @@ class BWT_IndexNow_Admin_Utils {
 	public static function get_retry_queue_count() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
 		//phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table_name" );
 		//phpcs:enable
@@ -247,13 +271,90 @@ class BWT_IndexNow_Admin_Utils {
 
 	/**
 	 * Delete all items from the retry queue.
+	 *
+	 * @return array Deleted retry queue row objects.
 	 */
 	public static function clear_retry_queue() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
+		//phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$items = $wpdb->get_results( "SELECT * FROM $table_name", OBJECT );
+		//phpcs:enable
 		//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
 		$wpdb->query( 'DELETE FROM ' . $table_name );
 		//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+
+		return is_array( $items ) ? $items : array();
+	}
+
+	/**
+	 * Keep only the latest retry queue items.
+	 *
+	 * @param int $max_items Maximum items to keep.
+	 * @return array Deleted retry queue row objects.
+	 */
+	public static function trim_retry_queue( $max_items ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		self::ensure_retry_queue_table_exists();
+		$max_items = max( 0, (int) $max_items );
+		$count = self::get_retry_queue_count();
+
+		if ( $count <= $max_items ) {
+			return array();
+		}
+
+		$delete_count = $count - $max_items;
+		$items = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM $table_name ORDER BY created_at ASC, id ASC LIMIT %d",
+			$delete_count
+		), OBJECT );
+
+		if ( empty( $items ) ) {
+			return array();
+		}
+
+		$ids = array_map( 'intval', wp_list_pluck( $items, 'id' ) );
+		//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "DELETE FROM $table_name WHERE id IN (" . implode( ',', $ids ) . ")" );
+		//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return $items;
+	}
+
+	/**
+	 * Create the retry queue table if it does not exist.
+	 * This protects upgraded installs where activation hooks did not run for new schema.
+	 */
+	private static function ensure_retry_queue_table_exists() {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'indexnow_retry_queue';
+		//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+		//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( $exists === $table_name ) {
+			return;
+		}
+
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_name (
+			id mediumint(10) NOT NULL AUTO_INCREMENT,
+			url varchar(200) DEFAULT '' NOT NULL,
+			type tinytext NOT NULL,
+			retry_count tinyint(3) NOT NULL DEFAULT 0,
+			max_retries tinyint(3) NOT NULL DEFAULT 3,
+			next_retry_at bigint(20) NOT NULL,
+			created_at bigint(20) NOT NULL,
+			last_error varchar(255) DEFAULT '' NOT NULL,
+			PRIMARY KEY  (id),
+			KEY next_retry_at (next_retry_at)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
 	}
 }
 

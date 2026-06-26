@@ -66,7 +66,7 @@ describe('Dashboard', () => {
       expect(screen.getAllByText('Automate URL submission').length).toBeGreaterThan(0);
       expect(screen.getAllByText(/Successful submissions/).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/Failed submissions/).length).toBeGreaterThan(0);
-      expect(screen.getAllByText('IndexNow Insights').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('IndexNow Insights in Bing Webmaster tools').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Excluded Paths').length).toBeGreaterThan(0);
     });
   });

@@ -28,9 +28,16 @@ class BWT_IndexNow_Activator {
 
 		// Schedule the retry queue cron event
 		if ( ! wp_next_scheduled( 'indexnow_process_retry_queue' ) ) {
-			wp_schedule_event( time(), 'every_minute', 'indexnow_process_retry_queue' );
+			$scheduled = wp_schedule_event( time() + 60, 'every_minute', 'indexnow_process_retry_queue', array(), true );
+			if ( false === $scheduled || is_wp_error( $scheduled ) ) {
+				if ( true === WP_DEBUG && true === WP_DEBUG_LOG ) {
+					$error = is_wp_error( $scheduled ) ? $scheduled->get_error_message() : 'wp_schedule_event returned false';
+					error_log( __METHOD__ . ' Could not schedule retry cron event: ' . $error );
+				}
+			}
 		}
 	}
+
 
 	public static function add_passed_submissions_table() {
 		global $wpdb;
